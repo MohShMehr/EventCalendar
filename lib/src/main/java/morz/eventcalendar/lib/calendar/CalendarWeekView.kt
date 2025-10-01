@@ -23,7 +23,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -42,12 +41,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ir.huri.jcal.JalaliCalendar
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOf
 import morz.eventcalendar.lib.model.DayItem
 import morz.eventcalendar.lib.util.JalaliCalendarHelper
 import morz.eventcalendar.lib.util.JalaliCalendarHelper.buildWeekDays
@@ -57,21 +50,43 @@ import morz.eventcalendar.lib.util.JalaliCalendarHelper.weekTitleFrom
 class CalendarWeekViewState(
     initialDate: JalaliCalendar = JalaliCalendarHelper.getCurrentDate()
 ) {
+
+    companion object {
+        val Saver: Saver<CalendarWeekViewState, *> = listSaver(
+            save = {
+                listOf(
+                    it.weeklyCurrentDate.year,
+                    it.weeklyCurrentDate.month,
+                    it.weeklyCurrentDate.day
+                )
+            },
+            restore = { CalendarWeekViewState(JalaliCalendar(it[0], it[1], it[2])) }
+        )
+    }
+
     var weeklyCurrentDate by mutableStateOf(initialDate)
         private set
     var weeklySelectedDate by mutableStateOf(initialDate)
         private set
 
-    fun setInitialDate() {
-        weeklyCurrentDate = JalaliCalendarHelper.getCurrentDate()
-        weeklySelectedDate = JalaliCalendarHelper.getCurrentDate()
-    }
+    var weekDays by mutableStateOf<List<DayItem>>(emptyList())
+        private set
 
 
     val isCurrentDateSelected
         get() =
             weeklySelectedDate.toString() ==
                     JalaliCalendarHelper.getCurrentDate().toString()
+
+    init {
+        recomputeWeekDays(weeklyCurrentDate)
+    }
+
+    fun setInitialDate() {
+        weeklyCurrentDate = JalaliCalendarHelper.getCurrentDate()
+        weeklySelectedDate = JalaliCalendarHelper.getCurrentDate()
+        recomputeWeekDays(weeklyCurrentDate)
+    }
 
     fun isHoliday(dayNumber: Int) =
         JalaliCalendarHelper.isFridaySimple(getCurrentJalaliDateByDay(dayNumber))
@@ -90,7 +105,6 @@ class CalendarWeekViewState(
 
         // Calculate previous week date with proper month boundary handling
         val previousWeek = if (weeklyCurrentDate.day <= 7) {
-            // Need to go to previous month
             if (weeklyCurrentDate.month == 1) {
                 val prevYear = weeklyCurrentDate.year - 1
                 val prevMonth = JalaliCalendar(prevYear, 12, 1)
@@ -167,40 +181,13 @@ class CalendarWeekViewState(
         return JalaliCalendarHelper.isSameDate(jalaliDate, weeklySelectedDate)
     }
 
-    private val _weekAnchor = MutableStateFlow(weeklyCurrentDate)
-
     fun setWeekAnchor(date: JalaliCalendar) {
-        _weekAnchor.value = date
+        recomputeWeekDays(date)
     }
 
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val weekDaysState: Flow<List<DayItem>> =
-        _weekAnchor
-            .filterNotNull()
-            .flatMapLatest { anchor -> weekDaysFor(anchor) }
-
-    private fun weekDaysFor(anchor: JalaliCalendar): Flow<List<DayItem>> {
-        return flowOf(buildWeekDays(anchor))
+    private fun recomputeWeekDays(anchor: JalaliCalendar) {
+        weekDays = buildWeekDays(anchor)
     }
-
-    companion object {
-        val Saver: Saver<CalendarWeekViewState, *> = listSaver(
-            save = {
-                listOf(
-                    it.weeklyCurrentDate.year,
-                    it.weeklyCurrentDate.month,
-                    it.weeklyCurrentDate.day
-                )
-            },
-            restore = {
-                CalendarWeekViewState(
-                    JalaliCalendar(it[0], it[1], it[2])
-                )
-            }
-        )
-    }
-
 
     @Composable
     fun rememberWeekTitle(weekDays: List<DayItem>): String {
@@ -228,7 +215,7 @@ fun CalendarWeekView(
     eventContents: List<@Composable ColumnScope.() -> Unit> = emptyList(),
 ) {
 
-    val weekDays by state.weekDaysState.collectAsState(emptyList())
+    val weekDays = state.weekDays
 
     val title = state.rememberWeekTitle(weekDays)
 

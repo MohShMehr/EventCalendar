@@ -25,7 +25,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.Saver
@@ -42,11 +41,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ir.huri.jcal.JalaliCalendar
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOf
 import morz.eventcalendar.lib.model.DayItem
 import morz.eventcalendar.lib.util.JalaliCalendarHelper
 import morz.eventcalendar.lib.util.JalaliCalendarHelper.buildMonthGrid
@@ -55,11 +49,41 @@ import morz.eventcalendar.lib.util.JalaliCalendarHelper.buildMonthGrid
 class CalendarMonthViewState(
     initialDate: JalaliCalendar = JalaliCalendarHelper.getCurrentDate()
 ) {
+
+    companion object {
+        val Saver: Saver<CalendarMonthViewState, *> = listSaver(
+            save = {
+                listOf(
+                    it.monthlyCurrentDate.year,
+                    it.monthlyCurrentDate.month,
+                    it.monthlyCurrentDate.day
+                )
+            },
+            restore = {
+                CalendarMonthViewState(
+                    JalaliCalendar(it[0], it[1], it[2])
+                )
+            }
+        )
+    }
+
     var monthlyCurrentDate by mutableStateOf(initialDate)
         private set
 
     var monthlySelectedDate by mutableStateOf(initialDate)
         private set
+
+    var monthDays by mutableStateOf<List<List<DayItem>>>(emptyList())
+        private set
+
+    val isCurrentDateSelected
+        get() =
+            monthlySelectedDate.toString() ==
+                    JalaliCalendarHelper.getCurrentDate().toString()
+
+    init {
+        recomputeMonthDays(monthlyCurrentDate)
+    }
 
     fun onPreviousMonth() {
         val previousMonth = if (monthlyCurrentDate.month == 1) {
@@ -89,48 +113,15 @@ class CalendarMonthViewState(
     fun setInitialDate() {
         monthlyCurrentDate = JalaliCalendarHelper.getCurrentDate()
         monthlySelectedDate = JalaliCalendarHelper.getCurrentDate()
+        recomputeMonthDays(monthlyCurrentDate)
     }
-
-    val isCurrentDateSelected
-        get() =
-            monthlySelectedDate.toString() ==
-                    JalaliCalendarHelper.getCurrentDate().toString()
-
-
-    // ---- NEW: anchors ----
-    private val _monthAnchor = MutableStateFlow(monthlyCurrentDate)
 
     fun setMonthAnchor(date: JalaliCalendar) {
-        // Normalize to first day of that Jalali month
-        _monthAnchor.value = JalaliCalendar(date.year, date.month, 1)
+        recomputeMonthDays(date)
     }
 
-    // ---- REPLACED: monthDaysState derived from month anchor ----
-    val monthDaysState: Flow<List<List<DayItem>>> =
-        _monthAnchor
-            .filterNotNull()
-            .flatMapLatest { anchor -> monthDaysFor(anchor) }
-
-    private fun monthDaysFor(anchor: JalaliCalendar): Flow<List<List<DayItem>>> {
-        return flowOf(buildMonthGrid(anchor.year, anchor.month))
-    }
-
-
-    companion object {
-        val Saver: Saver<CalendarMonthViewState, *> = listSaver(
-            save = {
-                listOf(
-                    it.monthlyCurrentDate.year,
-                    it.monthlyCurrentDate.month,
-                    it.monthlyCurrentDate.day
-                )
-            },
-            restore = {
-                CalendarMonthViewState(
-                    JalaliCalendar(it[0], it[1], it[2])
-                )
-            }
-        )
+    private fun recomputeMonthDays(anchor: JalaliCalendar) {
+        monthDays = buildMonthGrid(anchor.year, anchor.month)
     }
 }
 
@@ -149,7 +140,7 @@ fun CalendarMonthView(
     eventContents: List<@Composable ColumnScope.() -> Unit> = emptyList(),
 ) {
 
-    val monthDays by state.monthDaysState.collectAsState(emptyList())
+    val monthDays = state.monthDays
 
     Column(
         modifier = Modifier.fillMaxWidth(),
