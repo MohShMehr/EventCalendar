@@ -1,6 +1,7 @@
 package morz.eventcalendar.lib.sample
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -17,8 +18,8 @@ import morz.eventcalendar.lib.calendar.DayItemEventView
 import morz.eventcalendar.lib.calendar.EventContent
 import morz.eventcalendar.lib.calendar.rememberCalendarEventsState
 import morz.eventcalendar.lib.sample.ui.theme.EventCalendarTheme
-import morz.eventcalendar.lib.util.DayItem
-import morz.eventcalendar.lib.util.EventDot
+import morz.eventcalendar.lib.model.DayItem
+import morz.eventcalendar.lib.model.EventDot
 import morz.eventcalendar.lib.util.JalaliCalendarHelper
 
 class MainActivity : ComponentActivity() {
@@ -49,11 +50,7 @@ fun CalendarPreview() {
 
 @Composable
 private fun CalendarEvents() {
-    val monthDays = JalaliCalendarHelper.getMonthDays(1404, 7)
-    monthDays.apply {
-        this[0][0].copy(events = listOf(EventDot(color = 0xFF5BCD85)))
-        this[0][3].copy(events = listOf(EventDot(color = 0xFF5BCD85), EventDot(color = 0xFFFF3304)))
-    }
+    val monthDays  = JalaliCalendarHelper.buildMonthGrid(1404, 7).toMutableList()
 
     val weekDays = mutableListOf<DayItem>()
     weekDays.clear()
@@ -96,16 +93,22 @@ private fun CalendarEvents() {
     }
     val calendarState = rememberCalendarEventsState(
         initialTabIndex = 1, // monthly by default
-        onWeeklySelectedDateChange = { /* update VM or analytics */ },
-        onMonthlySelectedDateChange = { /* ... */ },
-        onCurrentWeekChange = { /* ... */ },
-        onCurrentMonthChange = { /* ... */ },
+        onWeeklySelectedDateChange = {
+            Log.d("CalendarEvents", "onWeeklySelectedDateChange")
+        },
+        onMonthlySelectedDateChange = {
+            Log.d("CalendarEvents", "onMonthlySelectedDateChange")
+        },
+        onCurrentWeekChange = {
+            Log.d("CalendarEvents", "onCurrentWeekChange")
+        },
+        onCurrentMonthChange = {
+            Log.d("CalendarEvents", "onCurrentMonthChange")
+        },
     )
 
     CalendarEventsView(
         state = calendarState,
-        weekDays = weekDays,        // stable list if possible
-        monthDays = monthDays,
         modifier = Modifier.fillMaxWidth(),
         weekEventContents = weekEvContents,
         monthEventContents = monthEvContents

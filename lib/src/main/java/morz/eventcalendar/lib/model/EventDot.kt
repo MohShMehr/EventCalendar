@@ -1,4 +1,4 @@
-package morz.eventcalendar.lib.util
+package morz.eventcalendar.lib.model
 
 /**
  * Represents an event indicator dot in the calendar

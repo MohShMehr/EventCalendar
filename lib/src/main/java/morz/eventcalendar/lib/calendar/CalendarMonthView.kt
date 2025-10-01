@@ -25,6 +25,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.Saver
@@ -41,8 +42,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ir.huri.jcal.JalaliCalendar
-import morz.eventcalendar.lib.util.DayItem
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import morz.eventcalendar.lib.model.DayItem
 import morz.eventcalendar.lib.util.JalaliCalendarHelper
+import morz.eventcalendar.lib.util.JalaliCalendarHelper.buildMonthGrid
 
 @Stable
 class CalendarMonthViewState(
@@ -61,6 +68,7 @@ class CalendarMonthViewState(
             JalaliCalendar(monthlyCurrentDate.year, monthlyCurrentDate.month - 1, 1)
         }
         monthlyCurrentDate = previousMonth
+        setMonthAnchor(previousMonth)
     }
 
     fun onNextMonth() {
@@ -70,6 +78,7 @@ class CalendarMonthViewState(
             JalaliCalendar(monthlyCurrentDate.year, monthlyCurrentDate.month + 1, 1)
         }
         monthlyCurrentDate = nextMonth
+        setMonthAnchor(nextMonth)
     }
 
     fun updateMonthlySelectedDate(selectedDate: JalaliCalendar) {
@@ -84,8 +93,28 @@ class CalendarMonthViewState(
 
     val isCurrentDateSelected
         get() =
-        monthlySelectedDate.toString() ==
-                JalaliCalendarHelper.getCurrentDate().toString()
+            monthlySelectedDate.toString() ==
+                    JalaliCalendarHelper.getCurrentDate().toString()
+
+
+    // ---- NEW: anchors ----
+    private val _monthAnchor = MutableStateFlow(monthlyCurrentDate)
+
+    fun setMonthAnchor(date: JalaliCalendar) {
+        // Normalize to first day of that Jalali month
+        _monthAnchor.value = JalaliCalendar(date.year, date.month, 1)
+    }
+
+    // ---- REPLACED: monthDaysState derived from month anchor ----
+    val monthDaysState: Flow<List<List<DayItem>>> =
+        _monthAnchor
+            .filterNotNull()
+            .flatMapLatest { anchor -> monthDaysFor(anchor) }
+
+    private fun monthDaysFor(anchor: JalaliCalendar): Flow<List<List<DayItem>>> {
+        return flowOf(buildMonthGrid(anchor.year, anchor.month))
+    }
+
 
     companion object {
         val Saver: Saver<CalendarMonthViewState, *> = listSaver(
@@ -117,9 +146,11 @@ fun rememberCalendarMonthViewState(
 @Composable
 fun CalendarMonthView(
     state: CalendarMonthViewState = rememberCalendarMonthViewState(JalaliCalendarHelper.getCurrentDate()),
-    monthDays: List<List<DayItem>> = emptyList(),
     eventContents: List<@Composable ColumnScope.() -> Unit> = emptyList(),
 ) {
+
+    val monthDays by state.monthDaysState.collectAsState(emptyList())
+
     Column(
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(4.dp) // Keep original compact spacing
@@ -290,7 +321,7 @@ private fun MonthlyDaysGrid(
                     currentDate.month,
                     dayNumber
                 )
-                val isToday = JalaliCalendarHelper.isToday(jalaliDate)
+
                 val isSelected = JalaliCalendarHelper.isSameDate(jalaliDate, selectedDate)
                 val isHoliday = JalaliCalendarHelper.isFridaySimple(jalaliDate)
 
@@ -339,10 +370,11 @@ private fun MonthlyLoadingState() {
 }
 
 typealias EventContent = @Composable ColumnScope.() -> Unit
+
 @Preview(showBackground = true)
 @Composable
-private fun CalendarWeekViewPreview() {
-    val monthDays = JalaliCalendarHelper.getMonthDays(1402,6)
+private fun CalendarMonthViewPreview() {
+    val monthDays = buildMonthGrid(1402, 6)
 
     val evContents: List<EventContent> = monthDays.flatten().map { dayItem ->
         if (dayItem.events.isNotEmpty()) {
@@ -354,7 +386,6 @@ private fun CalendarWeekViewPreview() {
         }
     }
     CalendarMonthView(
-        monthDays = monthDays,
         eventContents = evContents
     )
 }

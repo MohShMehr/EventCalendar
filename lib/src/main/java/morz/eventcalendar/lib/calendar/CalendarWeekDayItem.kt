@@ -30,8 +30,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import morz.eventcalendar.lib.util.DayItem
-import morz.eventcalendar.lib.util.EventDot
+import morz.eventcalendar.lib.model.DayItem
+import morz.eventcalendar.lib.model.EventDot
 
 
 @Composable
@@ -107,13 +107,8 @@ fun CalendarWeekDayItem(
 
                 Spacer(modifier = Modifier.height(4.dp))
 
-                // Events
-                if (dayItem.events.isNotEmpty()) {
-                    Column {
-                        eventContent()
-                    }
-                } else {
-                    Spacer(modifier = Modifier.height(6.dp))
+                Column {
+                    eventContent()
                 }
             }
         }

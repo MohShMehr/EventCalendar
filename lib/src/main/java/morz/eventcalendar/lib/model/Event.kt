@@ -1,4 +1,4 @@
-package morz.eventcalendar.lib.util
+package morz.eventcalendar.lib.model
 
 import android.graphics.Color
 import java.time.LocalDateTime

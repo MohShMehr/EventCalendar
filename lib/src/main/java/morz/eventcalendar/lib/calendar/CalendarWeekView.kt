@@ -23,6 +23,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -41,8 +42,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ir.huri.jcal.JalaliCalendar
-import morz.eventcalendar.lib.util.DayItem
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import morz.eventcalendar.lib.model.DayItem
 import morz.eventcalendar.lib.util.JalaliCalendarHelper
+import morz.eventcalendar.lib.util.JalaliCalendarHelper.buildWeekDays
+import morz.eventcalendar.lib.util.JalaliCalendarHelper.weekTitleFrom
 
 @Stable
 class CalendarWeekViewState(
@@ -64,9 +73,6 @@ class CalendarWeekViewState(
             weeklySelectedDate.toString() ==
                     JalaliCalendarHelper.getCurrentDate().toString()
 
-    val fromDateToDateWeekDisplay: String
-        get() = makeDataTitle()
-
     fun isHoliday(dayNumber: Int) =
         JalaliCalendarHelper.isFridaySimple(getCurrentJalaliDateByDay(dayNumber))
 
@@ -75,16 +81,6 @@ class CalendarWeekViewState(
         weeklyCurrentDate.month,
         dayNumber
     )
-
-    fun makeDataTitle(): String {
-        val weekStart = JalaliCalendarHelper.getWeekStart(weeklyCurrentDate)
-        val weekEnd = JalaliCalendarHelper.getWeekEnd(weeklyCurrentDate)
-        return "${JalaliCalendarHelper.formatPersianDate(weekStart)} - ${
-            JalaliCalendarHelper.formatPersianDate(
-                weekEnd
-            )
-        }"
-    }
 
     fun updateWeeklySelectedDate(dayNumber: Int) {
         weeklySelectedDate = getCurrentJalaliDateByDay(dayNumber)
@@ -124,6 +120,8 @@ class CalendarWeekViewState(
             ).monthLength
         ) {
             weeklyCurrentDate = previousWeek
+            setWeekAnchor(previousWeek)
+
         }
     }
 
@@ -156,6 +154,7 @@ class CalendarWeekViewState(
             ).monthLength
         ) {
             weeklyCurrentDate = nextWeek
+            setWeekAnchor(nextWeek)
         }
     }
 
@@ -166,6 +165,23 @@ class CalendarWeekViewState(
             dayNumber
         )
         return JalaliCalendarHelper.isSameDate(jalaliDate, weeklySelectedDate)
+    }
+
+    private val _weekAnchor = MutableStateFlow(weeklyCurrentDate)
+
+    fun setWeekAnchor(date: JalaliCalendar) {
+        _weekAnchor.value = date
+    }
+
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val weekDaysState: Flow<List<DayItem>> =
+        _weekAnchor
+            .filterNotNull()
+            .flatMapLatest { anchor -> weekDaysFor(anchor) }
+
+    private fun weekDaysFor(anchor: JalaliCalendar): Flow<List<DayItem>> {
+        return flowOf(buildWeekDays(anchor))
     }
 
     companion object {
@@ -207,11 +223,12 @@ fun rememberCalendarWeekViewState(
 
 @Composable
 fun CalendarWeekView(
-    weekDays: List<DayItem>,
     state: CalendarWeekViewState = rememberCalendarWeekViewState(),
     arrowBorderColor: Color = Color(0xFFEEEEEE),
     eventContents: List<@Composable ColumnScope.() -> Unit> = emptyList(),
 ) {
+
+    val weekDays by state.weekDaysState.collectAsState(emptyList())
 
     val title = state.rememberWeekTitle(weekDays)
 
@@ -326,36 +343,8 @@ private fun CalendarWeekViewPreview() {
         }
     }
     CalendarWeekView(
-        weekDays = weekDays,
         state = rememberCalendarWeekViewState(
         ),
         eventContents = evContents
     )
-}
-
-// Add this helper near the top-level (in CalendarWeekView2.kt)
-private fun weekTitleFrom(weekDays: List<DayItem>, anchor: JalaliCalendar): String {
-    if (weekDays.isEmpty()) return ""
-
-    val first = weekDays.firstOrNull { it.date.isNotEmpty() }?.date?.toIntOrNull() ?: return ""
-    val last = weekDays.lastOrNull { it.date.isNotEmpty() }?.date?.toIntOrNull() ?: return ""
-
-    // Determine month/year of the ends based on crossing behavior
-    // If first > last => week crosses month end (e.g., 29..4)
-    val (startY, startM) = if (first > last) {
-        if (anchor.month == 1) anchor.year - 1 to 12 else anchor.year to (anchor.month - 1)
-    } else anchor.year to anchor.month
-
-    val (endY, endM) = if (last < first) {
-        if (anchor.month == 12) anchor.year + 1 to 1 else anchor.year to (anchor.month + 1)
-    } else anchor.year to anchor.month
-
-    val start = JalaliCalendar(startY, startM, first)
-    val end = JalaliCalendar(endY, endM, last)
-
-    return "${JalaliCalendarHelper.formatPersianDate(start)} - ${
-        JalaliCalendarHelper.formatPersianDate(
-            end
-        )
-    }"
 }

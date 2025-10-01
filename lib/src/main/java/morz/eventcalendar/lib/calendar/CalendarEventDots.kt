@@ -13,8 +13,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import morz.eventcalendar.lib.util.DayItem
-import morz.eventcalendar.lib.util.EventDot
+import morz.eventcalendar.lib.model.DayItem
+import morz.eventcalendar.lib.model.EventDot
 
 @Composable
 fun DayItemEventView(dayItem: DayItem, numberOfEventsToShow: Int){
