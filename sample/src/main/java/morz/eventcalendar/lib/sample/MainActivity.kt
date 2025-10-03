@@ -88,7 +88,7 @@ private fun CalendarEvents() {
                 painter = eventImage
             ),
             DateId(date.year, date.month, date.day - 2) to CustomEvent(
-                content = {CustomEventView()}
+                content = { CustomEventView() }
             )
         )
 
@@ -110,7 +110,7 @@ private fun CalendarEvents() {
                 painter = eventImage
             ),
             DateId(date.year, date.month, date.day - 2) to CustomEvent(
-                content = {CustomEventView()}
+                content = { CustomEventView() }
             )
         )
 
@@ -119,6 +119,12 @@ private fun CalendarEvents() {
 
     CalendarEventsView(
         state = calendarState,
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth(),
+        tabBorderColor = Color(0xFF5E5E5E),
+        tabSelectedColor = Color(0xFF964747),
+        selectedDayColor = Color(0xFF3B6232),
+        holidayDayColor = Color(0xFFFF0000),
+        dayColor = Color(0xFF7C7C7C),
+        dayNameColor = Color(0xFFCCCCCC)
     )
 }

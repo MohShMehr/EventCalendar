@@ -3,10 +3,10 @@ package morz.eventcalendar.lib.calendar
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -153,7 +153,11 @@ fun rememberCalendarMonthViewState(
 @Composable
 fun CalendarMonthView(
     state: CalendarMonthViewState = rememberCalendarMonthViewState(JalaliCalendarHelper.getCurrentDate()),
-    registry: RendererRegistry
+    registry: RendererRegistry,
+    selectedColor: Color,
+    holidayColor: Color,
+    dayColor: Color,
+    dayNameColor: Color,
 ) {
 
     val monthDays = state.monthDays
@@ -180,7 +184,11 @@ fun CalendarMonthView(
                 state.updateMonthlySelectedDate(it)
             },
             monthEventsMap = state.monthEventsMap,
-            registry = registry
+            registry = registry,
+            selectedColor = selectedColor,
+            holidayColor = holidayColor,
+            dayColor = dayColor,
+            dayNameColor = dayNameColor
         )
     }
 }
@@ -220,11 +228,12 @@ private fun MonthlyHeader(
         Column(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            val isDark = isSystemInDarkTheme()
             Text(
                 text = "${JalaliCalendarHelper.getMonthName(currentDate.month)} ${currentDate.year}",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.Black,
+                color = if (isDark) Color.White else Color.Black,
                 textAlign = TextAlign.Center
             )
         }
@@ -257,33 +266,41 @@ private fun MonthlyCalendarGrid(
     selectedDate: JalaliCalendar,
     onDaySelect: (JalaliCalendar) -> Unit,
     monthEventsMap: Map<DateId, CalendarEvent>,
-    registry: RendererRegistry
+    registry: RendererRegistry,
+    selectedColor: Color,
+    holidayColor: Color,
+    dayColor: Color,
+    dayNameColor: Color,
 ) {
     Column(
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        // Day headers row
-        MonthlyDayHeaders()
 
-        // Calendar grid - no extra spacing
-        if (monthDays.isEmpty()) {
-            MonthlyLoadingState()
-        } else {
+        MonthlyDayHeaders(
+            dayNameColor = dayNameColor
+        )
+
+        if (monthDays.isNotEmpty()) {
             MonthlyDaysGrid(
                 monthDays = monthDays,
                 currentDate = currentDate,
                 selectedDate = selectedDate,
                 onDaySelect = onDaySelect,
                 monthEventsMap = monthEventsMap,
-                registry = registry
+                registry = registry,
+                selectedColor = selectedColor,
+                holidayColor = holidayColor,
+                dayColor = dayColor,
             )
         }
     }
 }
 
 @Composable
-private fun MonthlyDayHeaders() {
+private fun MonthlyDayHeaders(
+    dayNameColor: Color,
+) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceEvenly
@@ -293,7 +310,7 @@ private fun MonthlyDayHeaders() {
                 text = dayHeader,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Medium,
-                color = Color.Gray,
+                color = dayNameColor,
                 modifier = Modifier.weight(1f),
                 textAlign = TextAlign.Center
             )
@@ -308,10 +325,12 @@ private fun MonthlyDaysGrid(
     selectedDate: JalaliCalendar,
     onDaySelect: (JalaliCalendar) -> Unit,
     monthEventsMap: Map<DateId, CalendarEvent>,
-    registry: RendererRegistry
+    registry: RendererRegistry,
+    selectedColor: Color,
+    holidayColor: Color,
+    dayColor: Color,
 ) {
-    // Flatten the monthDays list but DON'T filter out empty days
-    // Empty days are needed for proper calendar grid layout
+
     val allDays = monthDays.flatten()
 
     LazyVerticalGrid(
@@ -353,45 +372,24 @@ private fun MonthlyDaysGrid(
                                 registry.Render(it)
                             }
                         }
-                    }
+                    },
+                    selectedColor = selectedColor,
+                    holidayColor = holidayColor,
+                    dayColor = dayColor
                 )
             } else {
                 // This is an empty cell - show it as empty
                 CalendarMonthDayItem(
                     dayItem = dayItem,
-                    onDayClick = { /* Empty cell - no action */ },
+                    selectedColor = selectedColor,
+                    holidayColor = holidayColor,
+                    dayColor = dayColor,
+                    onDayClick = { },
                 )
             }
         }
     }
 }
-
-@Composable
-private fun MonthlyLoadingState() {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(280.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = "در حال بارگذاری...",
-                color = Color.Gray,
-                fontSize = 14.sp
-            )
-            Text(
-                text = "لطفاً صبر کنید",
-                color = Color.Gray,
-                fontSize = 12.sp
-            )
-        }
-    }
-}
-
-typealias EventContent = @Composable ColumnScope.() -> Unit
 
 @Preview(showBackground = true)
 @Composable
@@ -404,6 +402,10 @@ private fun CalendarMonthViewPreview() {
                     TextRenderer, CustomRenderer
                 )
             )
-        }
+        },
+        selectedColor = Color(0xFF9C7DFF),
+        holidayColor = Color(0xFFCF3434),
+        dayColor = Color.Black,
+        dayNameColor = Color.Gray
     )
 }

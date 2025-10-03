@@ -13,6 +13,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.LayoutDirection
@@ -89,6 +90,12 @@ fun rememberCalendarEventsState(
 @Composable
 fun CalendarEventsView(
     modifier: Modifier = Modifier,
+    tabBorderColor: Color = Color(0xFFEEEEEE),
+    tabSelectedColor: Color = Color(0xFF7B55D3),
+    selectedDayColor: Color = Color(0xFF9C7DFF),
+    holidayDayColor: Color = Color(0xFFCF3434),
+    dayColor: Color = Color.Black,
+    dayNameColor: Color = Color.Gray,
     state: CalendarEventsState,
     registry: RendererRegistry = remember {
         RendererRegistry(
@@ -103,7 +110,13 @@ fun CalendarEventsView(
     CalendarEventsContent(
         modifier = modifier,
         state = state,
-        registry = registry
+        registry = registry,
+        tabBorderColor = tabBorderColor,
+        tabSelectedColor = tabSelectedColor,
+        selectedDayColor = selectedDayColor,
+        holidayDayColor = holidayDayColor,
+        dayColor = dayColor,
+        dayNameColor = dayNameColor
     )
 
 }
@@ -112,13 +125,21 @@ fun CalendarEventsView(
 private fun CalendarEventsContent(
     modifier: Modifier = Modifier,
     state: CalendarEventsState,
+    tabBorderColor: Color,
+    tabSelectedColor: Color,
+    selectedDayColor: Color,
+    holidayDayColor: Color,
+    dayColor: Color,
+    dayNameColor: Color,
     registry: RendererRegistry
 ) {
 
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
         Column(modifier) {
             CalendarTabsView(
-                state = state.tabsState
+                state = state.tabsState,
+                borderColor = tabBorderColor,
+                selectedColor = tabSelectedColor
             )
 
             Spacer(modifier = Modifier.height(10.dp))
@@ -127,14 +148,22 @@ private fun CalendarEventsContent(
                 CalendarTab.MONTHLY -> {
                     CalendarMonthView(
                         state = state.monthState,
-                        registry = registry
+                        registry = registry,
+                        selectedColor = selectedDayColor,
+                        holidayColor = holidayDayColor,
+                        dayColor = dayColor,
+                        dayNameColor = dayNameColor
                     )
                 }
 
                 CalendarTab.WEEKLY -> {
                     CalendarWeekView(
                         state = state.weekState,
-                        registry = registry
+                        registry = registry,
+                        selectedColor = selectedDayColor,
+                        holidayColor = holidayDayColor,
+                        dayColor = dayColor,
+                        dayNameColor = dayNameColor
                     )
                 }
             }

@@ -63,14 +63,16 @@ fun CalendarTabsView(
     state: CalendarTabsViewState = rememberCalendarTabsView(
         0
     ),
-    borderColor: Color = Color(0xFFEEEEEE),
-    selectedColor: Color = Color(0xFF7B55D3),
+    borderColor: Color,
+    selectedColor: Color,
+    showInHalfWidth: Boolean = false
 ) {
     val shape = RoundedCornerShape(20.dp)
-
+    val fraction =
+        if (showInHalfWidth) 0.5f else 1.0f
     Row(
         modifier
-            .fillMaxWidth(),
+            .fillMaxWidth(fraction = fraction),
         horizontalArrangement = Arrangement.End
     ) {
         Box(
@@ -135,6 +137,32 @@ fun CalendarTabsView(
     showBackground = true
 )
 @Composable
-private fun WeeklyViewPreview() {
-    CalendarTabsView()
+private fun CalendarTabsFullWidthPreview() {
+    Box(
+        modifier = Modifier.fillMaxWidth()
+    ){
+
+        CalendarTabsView(
+            borderColor = Color(0xFFEEEEEE),
+            selectedColor = Color(0xFF7B55D3)
+        )
+    }
+}
+
+@Preview(
+    locale = "FA",
+    showBackground = true,
+    backgroundColor = 0xFF000000
+)
+@Composable
+private fun CalendarTabsHalfWidthPreview() {
+    Box(
+        modifier = Modifier.fillMaxWidth()
+    ){
+        CalendarTabsView(
+            borderColor = Color(0xFFEEEEEE),
+            selectedColor = Color(0xFF7B55D3),
+            showInHalfWidth = true
+        )
+    }
 }

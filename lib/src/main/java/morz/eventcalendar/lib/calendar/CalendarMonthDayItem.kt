@@ -34,8 +34,9 @@ import morz.eventcalendar.lib.model.DayItem
 fun CalendarMonthDayItem(
     dayItem: DayItem,
     onDayClick: () -> Unit,
-    selectedColor: Color = Color(0xFF9C7DFF),
-    holidayColor: Color = Color(0xFFCF3434),
+    selectedColor: Color,
+    holidayColor: Color,
+    dayColor: Color,
     eventContent: @Composable (ColumnScope.() -> Unit) = {},
 ) {
     if (dayItem.date.isNotEmpty()) {
@@ -85,7 +86,7 @@ fun CalendarMonthDayItem(
                         color = when {
                             dayItem.isSelected -> selectedColor
                             dayItem.isHoliday -> holidayColor
-                            else -> Color.Black
+                            else -> dayColor
                         },
                         textAlign = TextAlign.Center
                     )
@@ -115,6 +116,9 @@ private fun CalendarMonthDayItemPreview() {
             date = "12",
             isSelected = false,
         ),
+        selectedColor = Color(0xFF9C7DFF),
+        holidayColor = Color(0xFFCF3434),
+        dayColor = Color.Black,
         onDayClick = {},
     )
 }
@@ -128,6 +132,9 @@ private fun CalendarMonthDayItemSelectedPreview() {
             date = "12",
             isSelected = true,
         ),
+        selectedColor = Color(0xFF9C7DFF),
+        holidayColor = Color(0xFFCF3434),
+        dayColor = Color.Black,
         onDayClick = {},
     )
 }
@@ -146,6 +153,9 @@ private fun CalendarMonthDayItemWithEventPreview() {
     CalendarMonthDayItem(
         dayItem = dayItem,
         onDayClick = {},
+        selectedColor = Color(0xFF9C7DFF),
+        holidayColor = Color(0xFFCF3434),
+        dayColor = Color.Black
     ) {
         Row(
             horizontalArrangement = Arrangement.spacedBy(2.dp)

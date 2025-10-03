@@ -37,8 +37,10 @@ import morz.eventcalendar.lib.model.DayItem
 fun CalendarWeekDayItem(
     dayItem: DayItem,
     onDayClick: () -> Unit,
-    selectedColor: Color = Color(0xFF9C7DFF),
-    holidayColor: Color = Color(0xFFCF3434),
+    selectedColor: Color,
+    holidayColor: Color,
+    dayColor: Color,
+    dayNameColor: Color,
     eventContent: @Composable (ColumnScope.() -> Unit) = {},
 ) {
     Card(
@@ -85,7 +87,11 @@ fun CalendarWeekDayItem(
                     text = dayItem.dayName,
                     fontSize = 8.sp,
                     fontWeight = FontWeight.Light,
-                    color = if (dayItem.isSelected) selectedColor else Color.Gray,
+                    color = when {
+                        dayItem.isSelected -> selectedColor
+                        dayItem.isHoliday -> holidayColor
+                        else -> dayNameColor
+                    },
                     textAlign = TextAlign.Center
                 )
 
@@ -99,7 +105,7 @@ fun CalendarWeekDayItem(
                     color = when {
                         dayItem.isSelected -> selectedColor
                         dayItem.isHoliday -> holidayColor
-                        else -> Color.Gray
+                        else -> dayColor
                     },
                     textAlign = androidx.compose.ui.text.style.TextAlign.Center
                 )
@@ -124,6 +130,10 @@ private fun CalendarWeekDayItemPreview() {
             date = "12",
             isSelected = false,
         ),
+        selectedColor = Color(0xFF9C7DFF),
+        holidayColor = Color(0xFFCF3434),
+        dayColor = Color.Black,
+        dayNameColor = Color.Gray,
         onDayClick = {},
     )
 }
@@ -137,6 +147,10 @@ private fun CalendarWeekDayItemSelectedPreview() {
             date = "12",
             isSelected = true,
         ),
+        selectedColor = Color(0xFF9C7DFF),
+        holidayColor = Color(0xFFCF3434),
+        dayColor = Color.Black,
+        dayNameColor = Color.Gray,
         onDayClick = {},
     )
 }
@@ -153,6 +167,10 @@ private fun CalendarWeekDayItemWithEventPreview() {
     val colors = arrayOf(0xFF7D5260, 0xFF625b71, 0xFF6650a4)
     CalendarWeekDayItem(
         dayItem = dayItem,
+        selectedColor = Color(0xFF9C7DFF),
+        holidayColor = Color(0xFFCF3434),
+        dayColor = Color.Black,
+        dayNameColor = Color.Gray,
         onDayClick = {},
     ) {
         Row(

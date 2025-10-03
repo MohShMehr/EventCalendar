@@ -3,6 +3,7 @@ package morz.eventcalendar.lib.calendar
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -226,6 +227,10 @@ fun rememberCalendarWeekViewState(
 fun CalendarWeekView(
     state: CalendarWeekViewState = rememberCalendarWeekViewState(),
     arrowBorderColor: Color = Color(0xFFEEEEEE),
+    selectedColor: Color,
+    holidayColor: Color,
+    dayColor: Color,
+    dayNameColor: Color,
     registry: RendererRegistry
 ) {
 
@@ -266,11 +271,12 @@ fun CalendarWeekView(
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                val isDark = isSystemInDarkTheme()
                 Text(
                     text = title, // ← use computed title
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.Black,
+                    color = if (isDark) Color.White else Color.Black,
                     textAlign = TextAlign.Center
                 )
             }
@@ -313,6 +319,10 @@ fun CalendarWeekView(
                             onDayClick = {
                                 state.updateWeeklySelectedDate(dayNumber)
                             },
+                            selectedColor = selectedColor,
+                            holidayColor = holidayColor,
+                            dayColor = dayColor,
+                            dayNameColor = dayNameColor,
                             eventContent = {
                                 if (state.weekEventsMap.isNotEmpty()) {
                                     val dateId = DateId(
@@ -339,6 +349,10 @@ private fun CalendarWeekViewPreview() {
     CalendarWeekView(
         state = rememberCalendarWeekViewState(
         ),
+        selectedColor = Color(0xFF9C7DFF),
+        holidayColor = Color(0xFFCF3434),
+        dayColor = Color.Black,
+        dayNameColor = Color.Gray,
         registry = remember {
             RendererRegistry(
                 setOf(
