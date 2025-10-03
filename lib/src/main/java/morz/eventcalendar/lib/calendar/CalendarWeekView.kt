@@ -6,7 +6,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -41,7 +40,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ir.huri.jcal.JalaliCalendar
+import morz.eventcalendar.lib.model.DateId
 import morz.eventcalendar.lib.model.DayItem
+import morz.eventcalendar.lib.model.events.CalendarEvent
+import morz.eventcalendar.lib.model.registery.RendererRegistry
+import morz.eventcalendar.lib.model.renederers.CircleColorRenderer
+import morz.eventcalendar.lib.model.renederers.PictureRenderer
+import morz.eventcalendar.lib.model.renederers.RectangleColorRenderer
+import morz.eventcalendar.lib.model.renederers.TextRenderer
 import morz.eventcalendar.lib.util.JalaliCalendarHelper
 import morz.eventcalendar.lib.util.JalaliCalendarHelper.buildWeekDays
 import morz.eventcalendar.lib.util.JalaliCalendarHelper.weekTitleFrom
@@ -70,6 +76,9 @@ class CalendarWeekViewState(
         private set
 
     var weekDays by mutableStateOf<List<DayItem>>(emptyList())
+        private set
+
+    var weekEventsMap by mutableStateOf<Map<DateId, CalendarEvent>>(emptyMap())
         private set
 
 
@@ -196,6 +205,10 @@ class CalendarWeekViewState(
         }
         return title
     }
+
+    fun updateEvents(weekEventsMap: Map<DateId, CalendarEvent>) {
+        this.weekEventsMap = weekEventsMap
+    }
 }
 
 
@@ -212,7 +225,7 @@ fun rememberCalendarWeekViewState(
 fun CalendarWeekView(
     state: CalendarWeekViewState = rememberCalendarWeekViewState(),
     arrowBorderColor: Color = Color(0xFFEEEEEE),
-    eventContents: List<@Composable ColumnScope.() -> Unit> = emptyList(),
+    registry: RendererRegistry
 ) {
 
     val weekDays = state.weekDays
@@ -299,7 +312,18 @@ fun CalendarWeekView(
                             onDayClick = {
                                 state.updateWeeklySelectedDate(dayNumber)
                             },
-                            eventContent = eventContents[weekDays.indexOf(dayItem)]
+                            eventContent = {
+                                if (state.weekEventsMap.isNotEmpty()) {
+                                    val dateId = DateId(
+                                        year = state.weeklyCurrentDate.year,
+                                        month = state.weeklyCurrentDate.month,
+                                        day = dayNumber
+                                    )
+                                    state.weekEventsMap[dateId]?.let {
+                                        registry.Render(it)
+                                    }
+                                }
+                            }
                         )
                     }
                 }
@@ -308,30 +332,19 @@ fun CalendarWeekView(
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, locale = "fa")
 @Composable
 private fun CalendarWeekViewPreview() {
-    val weekDays = listOf(
-        DayItem(dayName = "شنبه", date = "29"),
-        DayItem(dayName = "یکشنبه", date = "30"),
-        DayItem(dayName = "دوشنبه", date = "31", isSelected = true),
-        DayItem(dayName = "سه‌شنبه", date = "1"),
-        DayItem(dayName = "چهارشنبه", date = "2"),
-        DayItem(dayName = "پنج‌شنبه", date = "3"),
-        DayItem(dayName = "جمعه", date = "4"),
-    )
-    val evContents: List<EventContent> = weekDays.map { dayItem ->
-        if (dayItem.events.isNotEmpty()) {
-            {
-                DayItemEventView(dayItem, 2)
-            }
-        } else {
-            { /* empty */ }
-        }
-    }
     CalendarWeekView(
         state = rememberCalendarWeekViewState(
         ),
-        eventContents = evContents
+        registry = remember {
+            RendererRegistry(
+                setOf(
+                    CircleColorRenderer, PictureRenderer, RectangleColorRenderer,
+                    TextRenderer
+                )
+            )
+        }
     )
 }

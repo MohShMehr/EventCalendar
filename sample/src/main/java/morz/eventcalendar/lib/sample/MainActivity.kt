@@ -11,16 +11,19 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import morz.eventcalendar.lib.calendar.CalendarEventsView
-import morz.eventcalendar.lib.calendar.DayItemEventView
-import morz.eventcalendar.lib.calendar.EventContent
 import morz.eventcalendar.lib.calendar.rememberCalendarEventsState
+import morz.eventcalendar.lib.model.DateId
+import morz.eventcalendar.lib.model.events.CalendarEvent
+import morz.eventcalendar.lib.model.events.CircleColorEvent
+import morz.eventcalendar.lib.model.events.PictureEvent
+import morz.eventcalendar.lib.model.events.RectangleColorEvent
 import morz.eventcalendar.lib.sample.ui.theme.EventCalendarTheme
-import morz.eventcalendar.lib.model.DayItem
-import morz.eventcalendar.lib.model.EventDot
-import morz.eventcalendar.lib.util.JalaliCalendarHelper
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -50,47 +53,6 @@ fun CalendarPreview() {
 
 @Composable
 private fun CalendarEvents() {
-    val monthDays  = JalaliCalendarHelper.buildMonthGrid(1404, 7).toMutableList()
-
-    val weekDays = mutableListOf<DayItem>()
-    weekDays.clear()
-    val jalaliWeekDays = listOf(
-        "شنبه", "یکشنبه", "دوشنبه", "سه‌شنبه", "چهارشنبه", "پنجشنبه", "جمعه"
-    )
-
-    for (day in 1..7) {
-        val dayName = jalaliWeekDays[(day - 1) % 7] // rotate weekday names
-        weekDays.add(
-            DayItem(
-                dayName = dayName,
-                date = day.toString().padStart(2, '0'),
-                isSelected = false,
-                events = if (day % 2 == 0) listOf(
-                    EventDot(color = 0xFF5BCD95),
-                    EventDot(color = 0xFF5BCD85),
-                    EventDot(color = 0xFFFF3304)
-                ) else emptyList()
-            )
-        )
-    }
-    val weekEvContents: List<EventContent> = weekDays.map { dayItem ->
-        if (dayItem.events.isNotEmpty()) {
-            {
-                DayItemEventView(dayItem, 2)
-            }
-        } else {
-            { /* empty */ }
-        }
-    }
-    val monthEvContents: List<EventContent> = monthDays.flatten().map { dayItem ->
-        if (dayItem.events.isNotEmpty()) {
-            {
-                DayItemEventView(dayItem, 2)
-            }
-        } else {
-            { /* empty */ }
-        }
-    }
     val calendarState = rememberCalendarEventsState(
         initialTabIndex = 1, // monthly by default
         onWeeklySelectedDateChange = {
@@ -107,10 +69,48 @@ private fun CalendarEvents() {
         },
     )
 
+    val eventImage = painterResource(android.R.drawable.ic_menu_week)
+
+    LaunchedEffect(calendarState.weekState.weeklyCurrentDate) {
+
+
+        val date = calendarState.weekState.weeklyCurrentDate
+        val weekEventsMap: Map<DateId, CalendarEvent> = mapOf(
+            DateId(date.year, date.month, date.day - 1) to CircleColorEvent(
+                color = Color(0xFF5BCD85)
+            ),
+            DateId(date.year, date.month, date.day) to RectangleColorEvent(
+                color = Color(0xFF9C27B0)
+            ),
+            DateId(date.year, date.month, date.day + 1) to PictureEvent(
+                painter = eventImage
+            )
+        )
+
+        calendarState.weekState.updateEvents(weekEventsMap)
+    }
+
+    LaunchedEffect(calendarState.monthState.monthlyCurrentDate) {
+
+
+        val date = calendarState.monthState.monthlyCurrentDate
+        val weekEventsMap: Map<DateId, CalendarEvent> = mapOf(
+            DateId(date.year, date.month, date.day - 1) to CircleColorEvent(
+                color = Color(0xFF5BCD85)
+            ),
+            DateId(date.year, date.month, date.day) to RectangleColorEvent(
+                color = Color(0xFF9C27B0)
+            ),
+            DateId(date.year, date.month, date.day + 1) to PictureEvent(
+                painter = eventImage
+            )
+        )
+
+        calendarState.monthState.updateEvents(weekEventsMap)
+    }
+
     CalendarEventsView(
         state = calendarState,
-        modifier = Modifier.fillMaxWidth(),
-        weekEventContents = weekEvContents,
-        monthEventContents = monthEvContents
+        modifier = Modifier.fillMaxWidth()
     )
 }

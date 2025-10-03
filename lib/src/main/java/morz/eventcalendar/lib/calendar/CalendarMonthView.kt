@@ -27,6 +27,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -41,7 +42,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ir.huri.jcal.JalaliCalendar
+import morz.eventcalendar.lib.model.DateId
 import morz.eventcalendar.lib.model.DayItem
+import morz.eventcalendar.lib.model.events.CalendarEvent
+import morz.eventcalendar.lib.model.registery.RendererRegistry
+import morz.eventcalendar.lib.model.renederers.CircleColorRenderer
+import morz.eventcalendar.lib.model.renederers.PictureRenderer
+import morz.eventcalendar.lib.model.renederers.RectangleColorRenderer
+import morz.eventcalendar.lib.model.renederers.TextRenderer
 import morz.eventcalendar.lib.util.JalaliCalendarHelper
 import morz.eventcalendar.lib.util.JalaliCalendarHelper.buildMonthGrid
 
@@ -74,6 +82,9 @@ class CalendarMonthViewState(
         private set
 
     var monthDays by mutableStateOf<List<List<DayItem>>>(emptyList())
+        private set
+
+    var monthEventsMap by mutableStateOf<Map<DateId, CalendarEvent>>(emptyMap())
         private set
 
     val isCurrentDateSelected
@@ -123,6 +134,10 @@ class CalendarMonthViewState(
     private fun recomputeMonthDays(anchor: JalaliCalendar) {
         monthDays = buildMonthGrid(anchor.year, anchor.month)
     }
+
+    fun updateEvents(weekEventsMap: Map<DateId, CalendarEvent>) {
+        this.monthEventsMap = weekEventsMap
+    }
 }
 
 @Composable
@@ -137,7 +152,7 @@ fun rememberCalendarMonthViewState(
 @Composable
 fun CalendarMonthView(
     state: CalendarMonthViewState = rememberCalendarMonthViewState(JalaliCalendarHelper.getCurrentDate()),
-    eventContents: List<@Composable ColumnScope.() -> Unit> = emptyList(),
+    registry: RendererRegistry
 ) {
 
     val monthDays = state.monthDays
@@ -163,7 +178,8 @@ fun CalendarMonthView(
             onDaySelect = {
                 state.updateMonthlySelectedDate(it)
             },
-            eventContents = eventContents
+            monthEventsMap = state.monthEventsMap,
+            registry = registry
         )
     }
 }
@@ -239,7 +255,8 @@ private fun MonthlyCalendarGrid(
     currentDate: JalaliCalendar,
     selectedDate: JalaliCalendar,
     onDaySelect: (JalaliCalendar) -> Unit,
-    eventContents: List<@Composable ColumnScope.() -> Unit> = emptyList(),
+    monthEventsMap: Map<DateId, CalendarEvent>,
+    registry: RendererRegistry
 ) {
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -257,7 +274,8 @@ private fun MonthlyCalendarGrid(
                 currentDate = currentDate,
                 selectedDate = selectedDate,
                 onDaySelect = onDaySelect,
-                eventContents = eventContents
+                monthEventsMap = monthEventsMap,
+                registry = registry
             )
         }
     }
@@ -288,7 +306,8 @@ private fun MonthlyDaysGrid(
     currentDate: JalaliCalendar,
     selectedDate: JalaliCalendar,
     onDaySelect: (JalaliCalendar) -> Unit,
-    eventContents: List<@Composable ColumnScope.() -> Unit> = emptyList(),
+    monthEventsMap: Map<DateId, CalendarEvent>,
+    registry: RendererRegistry
 ) {
     // Flatten the monthDays list but DON'T filter out empty days
     // Empty days are needed for proper calendar grid layout
@@ -322,7 +341,18 @@ private fun MonthlyDaysGrid(
                         isHoliday = isHoliday
                     ),
                     onDayClick = { onDaySelect(jalaliDate) },
-                    eventContent = eventContents[index]
+                    eventContent = {
+                        if (monthEventsMap.isNotEmpty()) {
+                            val dateId = DateId(
+                                year = currentDate.year,
+                                month = currentDate.month,
+                                day = dayNumber
+                            )
+                            monthEventsMap[dateId]?.let {
+                                registry.Render(it)
+                            }
+                        }
+                    }
                 )
             } else {
                 // This is an empty cell - show it as empty
@@ -365,18 +395,14 @@ typealias EventContent = @Composable ColumnScope.() -> Unit
 @Preview(showBackground = true)
 @Composable
 private fun CalendarMonthViewPreview() {
-    val monthDays = buildMonthGrid(1402, 6)
-
-    val evContents: List<EventContent> = monthDays.flatten().map { dayItem ->
-        if (dayItem.events.isNotEmpty()) {
-            {
-                DayItemEventView(dayItem, 2)
-            }
-        } else {
-            { /* empty */ }
-        }
-    }
     CalendarMonthView(
-        eventContents = evContents
+        registry = remember {
+            RendererRegistry(
+                setOf(
+                    CircleColorRenderer, PictureRenderer, RectangleColorRenderer,
+                    TextRenderer
+                )
+            )
+        }
     )
 }

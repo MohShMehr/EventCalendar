@@ -25,7 +25,7 @@ object JalaliCalendarHelper {
         val weeks = mutableListOf<List<DayItem>>()
         var cur = mutableListOf<DayItem>()
 
-        repeat(startOffset) { cur += DayItem("", "", false, emptyList()) } // leading blanks
+        repeat(startOffset) { cur += DayItem("", "", false) } // leading blanks
 
         for (d in 1..monthLen) {
             val dayName = JalaliCalendarHelper.getDayName(JalaliCalendar(year, month, d).dayOfWeek)
@@ -36,7 +36,7 @@ object JalaliCalendarHelper {
             }
         }
 
-        while (cur.size in 1..6) cur += DayItem("", "", false, emptyList()) // trailing blanks
+        while (cur.size in 1..6) cur += DayItem("", "", false) // trailing blanks
         if (cur.isNotEmpty()) weeks += cur
 
         return weeks
@@ -88,9 +88,16 @@ object JalaliCalendarHelper {
      * @return Persian day name
      */
     internal fun getDayName(dayOfWeek: Int): String {
-        val daysOfWeek =
-            listOf("شنبه", "یکشنبه", "دوشنبه", "سه‌شنبه", "چهارشنبه", "پنج‌شنبه", "جمعه")
-        return daysOfWeek.getOrNull(dayOfWeek - 1).orEmpty()
+        return when (dayOfWeek) {
+            7 -> "شنبه"
+            1 -> "یکشنبه"
+            2 -> "دوشنبه"
+            3 -> "سه‌شنبه"
+            4 -> "چهارشنبه"
+            5 -> "پنج‌شنبه"
+            6 -> "جمعه"
+            else -> ""
+        }
     }
 
 

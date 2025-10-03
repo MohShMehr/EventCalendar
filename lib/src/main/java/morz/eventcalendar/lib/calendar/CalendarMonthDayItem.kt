@@ -28,7 +28,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import morz.eventcalendar.lib.model.DayItem
-import morz.eventcalendar.lib.model.EventDot
 
 
 @Composable
@@ -115,7 +114,6 @@ private fun CalendarMonthDayItemPreview() {
             dayName = "شنبه",
             date = "12",
             isSelected = false,
-            events = listOf()
         ),
         onDayClick = {},
     )
@@ -129,7 +127,6 @@ private fun CalendarMonthDayItemSelectedPreview() {
             dayName = "شنبه",
             date = "12",
             isSelected = true,
-            events = listOf()
         ),
         onDayClick = {},
     )
@@ -144,12 +141,8 @@ private fun CalendarMonthDayItemWithEventPreview() {
         dayName = "شنبه",
         date = "12",
         isSelected = false,
-        events = listOf(
-            EventDot(color = 0xFF5BCD85),
-            EventDot(color = 0xFF5BCD85),
-            EventDot(color = 0xFFFF0004)
-        )
     )
+    val colors = arrayOf(0xFF7D5260, 0xFF625b71, 0xFF6650a4)
     CalendarMonthDayItem(
         dayItem = dayItem,
         onDayClick = {},
@@ -157,12 +150,12 @@ private fun CalendarMonthDayItemWithEventPreview() {
         Row(
             horizontalArrangement = Arrangement.spacedBy(2.dp)
         ) {
-            dayItem.events.take(3).forEach { event ->
+            colors.forEach { color ->
                 Box(
                     modifier = Modifier
                         .size(4.dp)
                         .clip(CircleShape)
-                        .background(Color(event.color))
+                        .background(Color(color))
                 )
             }
         }
