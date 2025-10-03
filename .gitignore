@@ -13,3 +13,18 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# Gradle
+.gradle/
+build/
+*/build/
+
+# Android Studio
+.idea/*
+!.idea/codeStyles
+!.idea/runConfigurations
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
