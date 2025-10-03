@@ -21,8 +21,10 @@ import morz.eventcalendar.lib.calendar.rememberCalendarEventsState
 import morz.eventcalendar.lib.model.DateId
 import morz.eventcalendar.lib.model.events.CalendarEvent
 import morz.eventcalendar.lib.model.events.CircleColorEvent
+import morz.eventcalendar.lib.model.events.CustomEvent
 import morz.eventcalendar.lib.model.events.PictureEvent
 import morz.eventcalendar.lib.model.events.RectangleColorEvent
+import morz.eventcalendar.lib.sample.ui.customEvent.CustomEventView
 import morz.eventcalendar.lib.sample.ui.theme.EventCalendarTheme
 
 class MainActivity : ComponentActivity() {
@@ -69,21 +71,24 @@ private fun CalendarEvents() {
         },
     )
 
-    val eventImage = painterResource(android.R.drawable.ic_menu_week)
+    val eventImage = painterResource(android.R.drawable.ic_delete)
 
     LaunchedEffect(calendarState.weekState.weeklyCurrentDate) {
 
 
         val date = calendarState.weekState.weeklyCurrentDate
         val weekEventsMap: Map<DateId, CalendarEvent> = mapOf(
-            DateId(date.year, date.month, date.day - 1) to CircleColorEvent(
+            DateId(date.year, date.month, date.day + 1) to CircleColorEvent(
                 color = Color(0xFF5BCD85)
             ),
             DateId(date.year, date.month, date.day) to RectangleColorEvent(
                 color = Color(0xFF9C27B0)
             ),
-            DateId(date.year, date.month, date.day + 1) to PictureEvent(
+            DateId(date.year, date.month, date.day - 1) to PictureEvent(
                 painter = eventImage
+            ),
+            DateId(date.year, date.month, date.day - 2) to CustomEvent(
+                content = {CustomEventView()}
             )
         )
 
@@ -95,14 +100,17 @@ private fun CalendarEvents() {
 
         val date = calendarState.monthState.monthlyCurrentDate
         val weekEventsMap: Map<DateId, CalendarEvent> = mapOf(
-            DateId(date.year, date.month, date.day - 1) to CircleColorEvent(
+            DateId(date.year, date.month, date.day + 1) to CircleColorEvent(
                 color = Color(0xFF5BCD85)
             ),
             DateId(date.year, date.month, date.day) to RectangleColorEvent(
                 color = Color(0xFF9C27B0)
             ),
-            DateId(date.year, date.month, date.day + 1) to PictureEvent(
+            DateId(date.year, date.month, date.day - 1) to PictureEvent(
                 painter = eventImage
+            ),
+            DateId(date.year, date.month, date.day - 2) to CustomEvent(
+                content = {CustomEventView()}
             )
         )
 

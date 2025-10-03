@@ -45,6 +45,7 @@ import morz.eventcalendar.lib.model.DayItem
 import morz.eventcalendar.lib.model.events.CalendarEvent
 import morz.eventcalendar.lib.model.registery.RendererRegistry
 import morz.eventcalendar.lib.model.renederers.CircleColorRenderer
+import morz.eventcalendar.lib.model.renederers.CustomRenderer
 import morz.eventcalendar.lib.model.renederers.PictureRenderer
 import morz.eventcalendar.lib.model.renederers.RectangleColorRenderer
 import morz.eventcalendar.lib.model.renederers.TextRenderer
@@ -342,7 +343,7 @@ private fun CalendarWeekViewPreview() {
             RendererRegistry(
                 setOf(
                     CircleColorRenderer, PictureRenderer, RectangleColorRenderer,
-                    TextRenderer
+                    TextRenderer, CustomRenderer
                 )
             )
         }

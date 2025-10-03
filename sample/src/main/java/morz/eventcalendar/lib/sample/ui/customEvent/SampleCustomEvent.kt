@@ -15,7 +15,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun DayItemEventView() {
+fun CustomEventView() {
     val colors = arrayOf(0xFF7D5260, 0xFF625b71, 0xFF6650a4)
     Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
         colors.forEach { color ->
@@ -36,6 +36,6 @@ fun DayItemEventView() {
 @Composable
 private fun DayItemEventPreview() {
     Column {
-        DayItemEventView()
+        CustomEventView()
     }
 }
