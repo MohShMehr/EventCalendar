@@ -156,6 +156,7 @@ fun CalendarMonthView(
     registry: RendererRegistry,
     selectedColor: Color,
     holidayColor: Color,
+    todayColor: Color,
     dayColor: Color,
     dayNameColor: Color,
 ) {
@@ -187,6 +188,7 @@ fun CalendarMonthView(
             registry = registry,
             selectedColor = selectedColor,
             holidayColor = holidayColor,
+            todayColor = todayColor,
             dayColor = dayColor,
             dayNameColor = dayNameColor
         )
@@ -269,6 +271,7 @@ private fun MonthlyCalendarGrid(
     registry: RendererRegistry,
     selectedColor: Color,
     holidayColor: Color,
+    todayColor: Color,
     dayColor: Color,
     dayNameColor: Color,
 ) {
@@ -291,6 +294,7 @@ private fun MonthlyCalendarGrid(
                 registry = registry,
                 selectedColor = selectedColor,
                 holidayColor = holidayColor,
+                todayColor = todayColor,
                 dayColor = dayColor,
             )
         }
@@ -328,6 +332,7 @@ private fun MonthlyDaysGrid(
     registry: RendererRegistry,
     selectedColor: Color,
     holidayColor: Color,
+    todayColor: Color,
     dayColor: Color,
 ) {
 
@@ -353,12 +358,10 @@ private fun MonthlyDaysGrid(
                 )
 
                 val isSelected = JalaliCalendarHelper.isSameDate(jalaliDate, selectedDate)
-                val isHoliday = JalaliCalendarHelper.isFridaySimple(jalaliDate)
 
                 CalendarMonthDayItem(
                     dayItem = dayItem.copy(
                         isSelected = isSelected,
-                        isHoliday = isHoliday
                     ),
                     onDayClick = { onDaySelect(jalaliDate) },
                     eventContent = {
@@ -375,6 +378,7 @@ private fun MonthlyDaysGrid(
                     },
                     selectedColor = selectedColor,
                     holidayColor = holidayColor,
+                    todayColor = todayColor,
                     dayColor = dayColor
                 )
             } else {
@@ -383,6 +387,7 @@ private fun MonthlyDaysGrid(
                     dayItem = dayItem,
                     selectedColor = selectedColor,
                     holidayColor = holidayColor,
+                    todayColor = todayColor,
                     dayColor = dayColor,
                     onDayClick = { },
                 )
@@ -405,6 +410,7 @@ private fun CalendarMonthViewPreview() {
         },
         selectedColor = Color(0xFF9C7DFF),
         holidayColor = Color(0xFFCF3434),
+        todayColor = Color(0xFF673AB7),
         dayColor = Color.Black,
         dayNameColor = Color.Gray
     )

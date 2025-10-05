@@ -40,6 +40,7 @@ fun CalendarWeekDayItem(
     onDayClick: () -> Unit,
     selectedColor: Color,
     holidayColor: Color,
+    todayColor: Color,
     dayColor: Color,
     dayNameColor: Color,
     eventContent: @Composable (ColumnScope.() -> Unit) = {},
@@ -91,6 +92,7 @@ fun CalendarWeekDayItem(
                     color = when {
                         dayItem.isSelected -> selectedColor
                         dayItem.isHoliday -> holidayColor
+                        dayItem.isToday -> todayColor
                         else -> dayNameColor
                     },
                     textAlign = TextAlign.Center
@@ -106,6 +108,7 @@ fun CalendarWeekDayItem(
                     color = when {
                         dayItem.isSelected -> selectedColor
                         dayItem.isHoliday -> holidayColor
+                        dayItem.isToday -> todayColor
                         else -> dayColor
                     },
                     textAlign = TextAlign.Center
@@ -133,6 +136,7 @@ private fun CalendarWeekDayItemPreview() {
         ),
         selectedColor = Color(0xFF9C7DFF),
         holidayColor = Color(0xFFCF3434),
+        todayColor = Color(0xFF673AB7),
         dayColor = Color.Black,
         dayNameColor = Color.Gray,
         onDayClick = {},
@@ -150,6 +154,7 @@ private fun CalendarWeekDayItemSelectedPreview() {
         ),
         selectedColor = Color(0xFF9C7DFF),
         holidayColor = Color(0xFFCF3434),
+        todayColor = Color(0xFF673AB7),
         dayColor = Color.Black,
         dayNameColor = Color.Gray,
         onDayClick = {},
@@ -170,6 +175,7 @@ private fun CalendarWeekDayItemWithEventPreview() {
         dayItem = dayItem,
         selectedColor = Color(0xFF9C7DFF),
         holidayColor = Color(0xFFCF3434),
+        todayColor = Color(0xFF673AB7),
         dayColor = Color.Black,
         dayNameColor = Color.Gray,
         onDayClick = {},

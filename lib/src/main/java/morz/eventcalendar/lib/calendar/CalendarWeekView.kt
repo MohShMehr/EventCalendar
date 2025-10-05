@@ -226,6 +226,7 @@ fun CalendarWeekView(
     arrowBorderColor: Color = Color(0xFFEEEEEE),
     selectedColor: Color,
     holidayColor: Color,
+    todayColor: Color,
     dayColor: Color,
     dayNameColor: Color,
     registry: RendererRegistry
@@ -317,6 +318,7 @@ fun CalendarWeekView(
                             },
                             selectedColor = selectedColor,
                             holidayColor = holidayColor,
+                            todayColor = todayColor,
                             dayColor = dayColor,
                             dayNameColor = dayNameColor,
                             eventContent = {
@@ -347,6 +349,7 @@ private fun CalendarWeekViewPreview() {
         ),
         selectedColor = Color(0xFF9C7DFF),
         holidayColor = Color(0xFFCF3434),
+        todayColor = Color(0xFF673AB7),
         dayColor = Color.Black,
         dayNameColor = Color.Gray,
         registry = remember {

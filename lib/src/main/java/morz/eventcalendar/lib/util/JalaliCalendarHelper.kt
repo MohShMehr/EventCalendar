@@ -33,7 +33,7 @@ object JalaliCalendarHelper {
         for (d in 1..monthLen) {
             val date = JalaliCalendar(year, month, d)
             val dayName = getDayName(date.dayOfWeek)
-            cur += DayItem(dayName, date.toDateId(), false)
+            cur += DayItem(dayName, date.toDateId(), false,isHoliday = isFridaySimple(date))
             if (cur.size == 7) {
                 weeks += cur; cur = mutableListOf()
             }
@@ -181,6 +181,11 @@ object JalaliCalendarHelper {
         if (weekDays.isEmpty()) return ""
         return "${formatPersianDate(weekDays.first().dateId.toJalaliCalendar())} " +
                 "- ${formatPersianDate(weekDays.last().dateId.toJalaliCalendar())}"
+    }
+
+    fun isToday(jalali: JalaliCalendar): Boolean {
+        val today = JalaliCalendar()
+        return jalali.year == today.year && jalali.month == today.month && jalali.day == today.day
     }
 
 }

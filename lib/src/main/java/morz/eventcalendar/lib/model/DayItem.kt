@@ -1,6 +1,7 @@
 package morz.eventcalendar.lib.model
 
 import morz.eventcalendar.lib.util.FormatHelper
+import morz.eventcalendar.lib.util.JalaliCalendarHelper.isToday
 
 
 /**
@@ -21,6 +22,9 @@ data class DayItem(
     val dayNumber: String
         get() = FormatHelper.toPersianNumber(dateId.day.toString())
             .takeIf { dateId.day != 0  && dateId.month != 0 && dateId.year != 0 } ?: ""
+
+    val isToday: Boolean
+        get() = isToday(dateId.toJalaliCalendar())
 }
 
 

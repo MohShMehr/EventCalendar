@@ -37,6 +37,7 @@ fun CalendarMonthDayItem(
     onDayClick: () -> Unit,
     selectedColor: Color,
     holidayColor: Color,
+    todayColor: Color,
     dayColor: Color,
     eventContent: @Composable (ColumnScope.() -> Unit) = {},
 ) {
@@ -87,6 +88,7 @@ fun CalendarMonthDayItem(
                         color = when {
                             dayItem.isSelected -> selectedColor
                             dayItem.isHoliday -> holidayColor
+                            dayItem.isToday -> todayColor
                             else -> dayColor
                         },
                         textAlign = TextAlign.Center
@@ -119,6 +121,7 @@ private fun CalendarMonthDayItemPreview() {
         ),
         selectedColor = Color(0xFF9C7DFF),
         holidayColor = Color(0xFFCF3434),
+        todayColor = Color(0xFF673AB7),
         dayColor = Color.Black,
         onDayClick = {},
     )
@@ -135,6 +138,7 @@ private fun CalendarMonthDayItemSelectedPreview() {
         ),
         selectedColor = Color(0xFF9C7DFF),
         holidayColor = Color(0xFFCF3434),
+        todayColor = Color(0xFF673AB7),
         dayColor = Color.Black,
         onDayClick = {},
     )
@@ -156,6 +160,7 @@ private fun CalendarMonthDayItemWithEventPreview() {
         onDayClick = {},
         selectedColor = Color(0xFF9C7DFF),
         holidayColor = Color(0xFFCF3434),
+        todayColor = Color(0xFF673AB7),
         dayColor = Color.Black
     ) {
         Row(

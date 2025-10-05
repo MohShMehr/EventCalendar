@@ -94,6 +94,7 @@ fun CalendarEventsView(
     tabSelectedColor: Color = Color(0xFF7B55D3),
     selectedDayColor: Color = Color(0xFF9C7DFF),
     holidayDayColor: Color = Color(0xFFCF3434),
+    todayColor: Color = Color(0xFF673AB7),
     dayColor: Color = Color.Black,
     dayNameColor: Color = Color.Gray,
     state: CalendarEventsState,
@@ -114,6 +115,7 @@ fun CalendarEventsView(
         tabBorderColor = tabBorderColor,
         tabSelectedColor = tabSelectedColor,
         selectedDayColor = selectedDayColor,
+        todayColor = todayColor,
         holidayDayColor = holidayDayColor,
         dayColor = dayColor,
         dayNameColor = dayNameColor
@@ -129,6 +131,7 @@ private fun CalendarEventsContent(
     tabSelectedColor: Color,
     selectedDayColor: Color,
     holidayDayColor: Color,
+    todayColor: Color,
     dayColor: Color,
     dayNameColor: Color,
     registry: RendererRegistry
@@ -152,7 +155,8 @@ private fun CalendarEventsContent(
                         selectedColor = selectedDayColor,
                         holidayColor = holidayDayColor,
                         dayColor = dayColor,
-                        dayNameColor = dayNameColor
+                        dayNameColor = dayNameColor,
+                        todayColor = todayColor
                     )
                 }
 
@@ -163,7 +167,8 @@ private fun CalendarEventsContent(
                         selectedColor = selectedDayColor,
                         holidayColor = holidayDayColor,
                         dayColor = dayColor,
-                        dayNameColor = dayNameColor
+                        dayNameColor = dayNameColor,
+                        todayColor = todayColor
                     )
                 }
             }
