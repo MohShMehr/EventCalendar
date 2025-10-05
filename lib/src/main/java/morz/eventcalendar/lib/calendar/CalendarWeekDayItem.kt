@@ -30,6 +30,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import morz.eventcalendar.lib.model.DateId
 import morz.eventcalendar.lib.model.DayItem
 
 
@@ -99,7 +100,7 @@ fun CalendarWeekDayItem(
 
                 // Date with holiday styling
                 Text(
-                    text = dayItem.date,
+                    text = dayItem.dayNumber,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
                     color = when {
@@ -107,7 +108,7 @@ fun CalendarWeekDayItem(
                         dayItem.isHoliday -> holidayColor
                         else -> dayColor
                     },
-                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                    textAlign = TextAlign.Center
                 )
 
                 Spacer(modifier = Modifier.height(4.dp))
@@ -127,7 +128,7 @@ private fun CalendarWeekDayItemPreview() {
     CalendarWeekDayItem(
         dayItem = DayItem(
             dayName = "شنبه",
-            date = "12",
+            dateId = DateId(1402, 1, 12),
             isSelected = false,
         ),
         selectedColor = Color(0xFF9C7DFF),
@@ -144,7 +145,7 @@ private fun CalendarWeekDayItemSelectedPreview() {
     CalendarWeekDayItem(
         dayItem = DayItem(
             dayName = "شنبه",
-            date = "12",
+            dateId = DateId(1402, 1, 12),
             isSelected = true,
         ),
         selectedColor = Color(0xFF9C7DFF),
@@ -161,7 +162,7 @@ private fun CalendarWeekDayItemSelectedPreview() {
 private fun CalendarWeekDayItemWithEventPreview() {
     val dayItem = DayItem(
         dayName = "شنبه",
-        date = "12",
+        dateId = DateId(1402, 1, 12),
         isSelected = false,
     )
     val colors = arrayOf(0xFF7D5260, 0xFF625b71, 0xFF6650a4)

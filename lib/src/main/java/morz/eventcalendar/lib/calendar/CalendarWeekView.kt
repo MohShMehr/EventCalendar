@@ -99,9 +99,6 @@ class CalendarWeekViewState(
         recomputeWeekDays(weeklyCurrentDate)
     }
 
-    fun isHoliday(dayNumber: Int) =
-        JalaliCalendarHelper.isFridaySimple(getCurrentJalaliDateByDay(dayNumber))
-
     fun getCurrentJalaliDateByDay(dayNumber: Int) = JalaliCalendar(
         weeklyCurrentDate.year,
         weeklyCurrentDate.month,
@@ -203,7 +200,7 @@ class CalendarWeekViewState(
     @Composable
     fun rememberWeekTitle(weekDays: List<DayItem>): String {
         val title by remember(weekDays, weeklyCurrentDate) {
-            derivedStateOf { weekTitleFrom(weekDays, weeklyCurrentDate) }
+            derivedStateOf { weekTitleFrom(weekDays) }
         }
         return title
     }
@@ -308,13 +305,12 @@ fun CalendarWeekView(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             items(weekDays) { dayItem ->
-                if (dayItem.date.isNotEmpty()) {
-                    val dayNumber = dayItem.date.toIntOrNull()
+                if (dayItem.dayNumber.isNotEmpty()) {
+                    val dayNumber = dayItem.dayNumber.toIntOrNull()
                     if (dayNumber != null) {
                         CalendarWeekDayItem(
                             dayItem = dayItem.copy(
-                                isSelected = state.isSelected(dayNumber),
-                                isHoliday = state.isHoliday(dayNumber)
+                                isSelected = state.isSelected(dayNumber)
                             ),
                             onDayClick = {
                                 state.updateWeeklySelectedDate(dayNumber)

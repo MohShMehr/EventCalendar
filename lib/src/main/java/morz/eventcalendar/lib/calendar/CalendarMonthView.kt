@@ -230,7 +230,7 @@ private fun MonthlyHeader(
         ) {
             val isDark = isSystemInDarkTheme()
             Text(
-                text = "${JalaliCalendarHelper.getMonthName(currentDate.month)} ${currentDate.year}",
+                text = "${currentDate.monthString} ${currentDate.year}",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
                 color = if (isDark) Color.White else Color.Black,
@@ -344,7 +344,7 @@ private fun MonthlyDaysGrid(
     ) {
         items(allDays.size) { index ->
             val dayItem = allDays[index]
-            val dayNumber = dayItem.date.toIntOrNull()
+            val dayNumber = dayItem.dayNumber.toIntOrNull()
             if (dayNumber != null) {
                 val jalaliDate = JalaliCalendar(
                     currentDate.year,

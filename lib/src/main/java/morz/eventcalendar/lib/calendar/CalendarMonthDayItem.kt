@@ -27,6 +27,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import morz.eventcalendar.lib.model.DateId
 import morz.eventcalendar.lib.model.DayItem
 
 
@@ -39,11 +40,11 @@ fun CalendarMonthDayItem(
     dayColor: Color,
     eventContent: @Composable (ColumnScope.() -> Unit) = {},
 ) {
-    if (dayItem.date.isNotEmpty()) {
+    if (dayItem.dayNumber.isNotEmpty()) {
         Card(
             modifier = Modifier
                 .size(36.dp) // Keep original compact size
-                .testTag("monthly-day-${dayItem.date}"),
+                .testTag("monthly-day-${dayItem.dayNumber}"),
             shape = RoundedCornerShape(8.dp),
             elevation = CardDefaults.cardElevation(
                 defaultElevation = if (dayItem.isSelected) 6.dp else 2.dp
@@ -80,7 +81,7 @@ fun CalendarMonthDayItem(
                 ) {
                     // Date with holiday styling
                     Text(
-                        text = dayItem.date,
+                        text = dayItem.dayNumber,
                         fontSize = 12.sp, // Keep original font size
                         fontWeight = FontWeight.Medium,
                         color = when {
@@ -113,7 +114,7 @@ private fun CalendarMonthDayItemPreview() {
     CalendarMonthDayItem(
         dayItem = DayItem(
             dayName = "شنبه",
-            date = "12",
+            dateId = DateId(1402, 1, 12),
             isSelected = false,
         ),
         selectedColor = Color(0xFF9C7DFF),
@@ -129,7 +130,7 @@ private fun CalendarMonthDayItemSelectedPreview() {
     CalendarMonthDayItem(
         dayItem = DayItem(
             dayName = "شنبه",
-            date = "12",
+            dateId = DateId(1402, 1, 12),
             isSelected = true,
         ),
         selectedColor = Color(0xFF9C7DFF),
@@ -146,7 +147,7 @@ private fun CalendarMonthDayItemWithEventPreview() {
 
     val dayItem = DayItem(
         dayName = "شنبه",
-        date = "12",
+        dateId = DateId(1402, 1, 12),
         isSelected = false,
     )
     val colors = arrayOf(0xFF7D5260, 0xFF625b71, 0xFF6650a4)

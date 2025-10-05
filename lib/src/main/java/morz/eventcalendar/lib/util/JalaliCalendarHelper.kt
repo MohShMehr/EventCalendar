@@ -2,6 +2,9 @@ package morz.eventcalendar.lib.util
 
 import ir.huri.jcal.JalaliCalendar
 import morz.eventcalendar.lib.model.DayItem
+import morz.eventcalendar.lib.model.emptyDateId
+import morz.eventcalendar.lib.model.toDateId
+import morz.eventcalendar.lib.model.toJalaliCalendar
 
 /**
  * Utility class for JalaliCalendar operations
@@ -25,18 +28,18 @@ object JalaliCalendarHelper {
         val weeks = mutableListOf<List<DayItem>>()
         var cur = mutableListOf<DayItem>()
 
-        repeat(startOffset) { cur += DayItem("", "", false) } // leading blanks
+        repeat(startOffset) { cur += DayItem("", emptyDateId(), false) } // leading blanks
 
         for (d in 1..monthLen) {
-            val dayName = JalaliCalendarHelper.getDayName(JalaliCalendar(year, month, d).dayOfWeek)
-            val persian = FormatHelper.toPersianNumber(d.toString())
-            cur += DayItem(dayName, persian, false)
+            val date = JalaliCalendar(year, month, d)
+            val dayName = getDayName(date.dayOfWeek)
+            cur += DayItem(dayName, date.toDateId(), false)
             if (cur.size == 7) {
                 weeks += cur; cur = mutableListOf()
             }
         }
 
-        while (cur.size in 1..6) cur += DayItem("", "", false) // trailing blanks
+        while (cur.size in 1..6) cur += DayItem("", emptyDateId(), false) // trailing blanks
         if (cur.isNotEmpty()) weeks += cur
 
         return weeks
@@ -67,8 +70,9 @@ object JalaliCalendarHelper {
 
             out += DayItem(
                 dayName = getDayName(date.dayOfWeek),
-                date = FormatHelper.toPersianNumber(date.day.toString()),
-                isSelected = isSameDate(date, anchor)
+                dateId = date.toDateId(),
+                isSelected = isSameDate(date, anchor),
+                isHoliday = isFridaySimple(date)
             )
         }
         return out
@@ -100,20 +104,6 @@ object JalaliCalendarHelper {
         }
     }
 
-
-    /**
-     * Get month name in Persian
-     * @param month Month number (1-12)
-     * @return Persian month name
-     */
-    internal fun getMonthName(month: Int): String {
-        val months = listOf(
-            "فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور",
-            "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"
-        )
-        return months.getOrNull(month - 1).orEmpty()
-    }
-
     /**
      * Convert Jalali date to readable Persian string
      * @param jalali JalaliCalendar instance
@@ -121,7 +111,7 @@ object JalaliCalendarHelper {
      */
     internal fun formatPersianDate(jalali: JalaliCalendar): String {
         val day = FormatHelper.toPersianNumber(jalali.day.toString())
-        val month = getMonthName(jalali.month)
+        val month = jalali.monthString
         val year = FormatHelper.toPersianNumber(jalali.year.toString())
         return "$day $month $year"
     }
@@ -185,33 +175,13 @@ object JalaliCalendarHelper {
      * and last valid days in the week, considering potential month/year boundaries.
      *
      * @param weekDays List of DayItem representing the week (Saturday to Friday)
-     * @param anchor The JalaliCalendar date used as a reference for month and year
      * @return Formatted week title, or an empty string if no valid days are found
      */
-    internal fun weekTitleFrom(weekDays: List<DayItem>, anchor: JalaliCalendar): String {
+    internal fun weekTitleFrom(weekDays: List<DayItem>): String {
         if (weekDays.isEmpty()) return ""
-
-        val first = weekDays.firstOrNull { it.date.isNotEmpty() }?.date?.toIntOrNull() ?: return ""
-        val last = weekDays.lastOrNull { it.date.isNotEmpty() }?.date?.toIntOrNull() ?: return ""
-
-        // Determine month/year of the ends based on crossing behavior
-        // If first > last => week crosses month end (e.g., 29..4)
-        val (startY, startM) = if (first > last) {
-            if (anchor.month == 1) anchor.year - 1 to 12 else anchor.year to (anchor.month - 1)
-        } else anchor.year to anchor.month
-
-        val (endY, endM) = if (last < first) {
-            if (anchor.month == 12) anchor.year + 1 to 1 else anchor.year to (anchor.month + 1)
-        } else anchor.year to anchor.month
-
-        val start = JalaliCalendar(startY, startM, first)
-        val end = JalaliCalendar(endY, endM, last)
-
-        return "${JalaliCalendarHelper.formatPersianDate(start)} - ${
-            JalaliCalendarHelper.formatPersianDate(
-                end
-            )
-        }"
+        return "${formatPersianDate(weekDays.first().dateId.toJalaliCalendar())} " +
+                "- ${formatPersianDate(weekDays.last().dateId.toJalaliCalendar())}"
     }
+
 }
 
