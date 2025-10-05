@@ -2,7 +2,12 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    id("maven-publish")
 }
+
+val libraryGroupId = "com.github.mohshmehr"
+val libraryArtifactId = "event-calendar"
+val libraryVersion = "1.0.0"
 
 android {
     namespace = "morz.eventcalendar.lib"
@@ -10,7 +15,6 @@ android {
 
     defaultConfig {
         minSdk = 24
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
     }
@@ -24,10 +28,12 @@ android {
             )
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+
     kotlinOptions {
         jvmTarget = "11"
     }
@@ -42,4 +48,33 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     debugImplementation(libs.androidx.ui.tooling)
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("release") {
+            // Delay evaluation until Android plugin configures components
+            afterEvaluate {
+                from(components["release"])
+            }
+
+            groupId = libraryGroupId
+            artifactId = libraryArtifactId
+            version = libraryVersion
+        }
+    }
+
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/MohShMehr/event-calendar")
+
+            credentials {
+                username = project.findProperty("gpr.user") as String?
+                    ?: System.getenv("USERNAME_GITHUB")
+                password = project.findProperty("gpr.token") as String?
+                    ?: System.getenv("TOKEN_GITHUB")
+            }
+        }
+    }
 }
