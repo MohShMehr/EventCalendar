@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import morz.eventcalendar.lib.calendar.CalendarEventsView
 import morz.eventcalendar.lib.calendar.rememberCalendarEventsState
 import morz.eventcalendar.lib.model.DateId
@@ -55,28 +56,33 @@ fun CalendarPreview() {
 
 @Composable
 private fun CalendarEvents() {
+    //you can get all calendar event clicks here
     val calendarState = rememberCalendarEventsState(
-        initialTabIndex = 1, // monthly by default
+        initialTabIndex = 1,
         onWeeklySelectedDateChange = {
-            Log.d("CalendarEvents", "onWeeklySelectedDateChange")
+            Log.d("CalendarEvents", "get selected date in weekly calendar")
         },
         onMonthlySelectedDateChange = {
-            Log.d("CalendarEvents", "onMonthlySelectedDateChange")
+            Log.d("CalendarEvents", "get selected date in monthly calendar")
         },
         onCurrentWeekChange = {
-            Log.d("CalendarEvents", "onCurrentWeekChange")
+            Log.d("CalendarEvents", "get current date in next or previous week")
         },
         onCurrentMonthChange = {
-            Log.d("CalendarEvents", "onCurrentMonthChange")
+            Log.d("CalendarEvents", "get current date in next or previous month")
         },
     )
 
     val eventImage = painterResource(android.R.drawable.ic_delete)
 
+
+
+    //you can also update weekly calendar events by your data here
     LaunchedEffect(calendarState.weekState.weeklyCurrentDate) {
 
 
         val date = calendarState.weekState.weeklyCurrentDate
+        //in weekly calendar for displaying events you can use every child of CalendarEvent or make your custom event view
         val weekEventsMap: Map<DateId, CalendarEvent> = mapOf(
             DateId(date.year, date.month, date.day + 1) to CircleColorEvent(
                 color = Color(0xFF5BCD85)
@@ -95,10 +101,12 @@ private fun CalendarEvents() {
         calendarState.weekState.updateEvents(weekEventsMap)
     }
 
+    //you can also update monthly calendar events by your data here
     LaunchedEffect(calendarState.monthState.monthlyCurrentDate) {
 
 
         val date = calendarState.monthState.monthlyCurrentDate
+        //in monthly calendar for displaying events you can use every child of CalendarEvent or make your custom event view
         val weekEventsMap: Map<DateId, CalendarEvent> = mapOf(
             DateId(date.year, date.month, date.day + 1) to CircleColorEvent(
                 color = Color(0xFF5BCD85)
@@ -117,14 +125,21 @@ private fun CalendarEvents() {
         calendarState.monthState.updateEvents(weekEventsMap)
     }
 
-    CalendarEventsView(
-        state = calendarState,
-        modifier = Modifier.fillMaxWidth(),
-        tabBorderColor = Color(0xFF5E5E5E),
-        tabSelectedColor = Color(0xFF964747),
-        selectedDayColor = Color(0xFF3B6232),
-        holidayDayColor = Color(0xFFFF0000),
-        dayColor = Color(0xFF7C7C7C),
-        dayNameColor = Color(0xFFCCCCCC)
-    )
+    //customize your calendar
+    Column(
+        modifier = Modifier
+                .fillMaxSize()
+            .padding(10.dp)
+    ) {
+        CalendarEventsView(
+            state = calendarState,
+            modifier = Modifier.fillMaxWidth(),
+            tabBorderColor = Color(0xFF5E5E5E),
+            tabSelectedColor = Color(0xFF964747),
+            selectedDayColor = Color(0xFF3B6232),
+            holidayDayColor = Color(0xFFFF0000),
+            dayColor = Color(0xFF7C7C7C),
+            dayNameColor = Color(0xFFCCCCCC)
+        )
+    }
 }
