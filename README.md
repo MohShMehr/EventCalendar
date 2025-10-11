@@ -34,6 +34,30 @@ With built-in support for clickable event days and flexible customization, you c
 
 ---
 
+## 🚀 Installation
+
+Step 1. Add the JitPack repository to your build file
+
+```kotlin
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+        maven { url = uri("https://jitpack.io") }
+    }
+}
+```
+Step 2. Add the dependency
+
+```kotlin
+dependencies {
+    implementation("com.github.MohShMehr:EventCalendar:<latest-version>")
+}
+```
+
+---
+
 ### 🛠️ Tech Stack
 
 - **Android**
@@ -60,7 +84,7 @@ With built-in support for clickable event days and flexible customization, you c
 You can find a working example in the `sample` module.    
 Here’s a snippet showing how to use `EventCalendar` in your app:
 
-<pre><code class="language-kotlin">
+```kotlin
 @Composable
 private fun CalendarEvents() {
     // You can get all calendar event clicks here
@@ -140,7 +164,7 @@ private fun CalendarEvents() {
         )
     }
 }
-        </code></pre>
+```
 
 
 
