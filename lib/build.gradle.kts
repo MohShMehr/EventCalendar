@@ -7,7 +7,7 @@ plugins {
 
 val libraryGroupId = "com.github.mohshmehr"
 val libraryArtifactId = "event-calendar"
-val libraryVersion = "1.1.0"
+val libraryVersion = "1.1.1"
 
 android {
     namespace = "morz.eventcalendar.lib"

@@ -52,7 +52,7 @@ Step 2. Add the dependency
 
 ```kotlin
 dependencies {
-    implementation("com.github.MohShMehr:EventCalendar:1.1.0")
+    implementation("com.github.MohShMehr:EventCalendar:1.1.1")
 }
 ```
 
@@ -199,6 +199,9 @@ private fun CalendarEvents() {
 ---
 
 ### 📋 Changelog
+
+**v1.1.1**
+- Fix tab font size in `CalendarTabsView`
 
 **v1.1.0**
 - Add `tabsHalfWidth` and `tabsRtl` flags for tab bar layout
