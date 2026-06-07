@@ -127,7 +127,7 @@ fun CalendarTabsView(
                                 Text(
                                     text = text,
                                     color = if (isSelected) Color.White else Color.Gray,
-                                    fontSize = 14.sp,
+                                    fontSize = 10.sp,
                                     fontWeight = if (isSelected) FontWeight.Medium else FontWeight.Normal
                                 )
                             }
