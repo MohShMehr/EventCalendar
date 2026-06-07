@@ -52,7 +52,7 @@ Step 2. Add the dependency
 
 ```kotlin
 dependencies {
-    implementation("com.github.MohShMehr:EventCalendar:<latest-version>")
+    implementation("com.github.MohShMehr:EventCalendar:1.1.0")
 }
 ```
 
@@ -157,8 +157,12 @@ private fun CalendarEvents() {
             modifier = Modifier.fillMaxWidth(),
             tabBorderColor = Color(0xFF5E5E5E),
             tabSelectedColor = Color(0xFF964747),
+            tabsHalfWidth = true,
+            tabsRtl = true,
             selectedDayColor = Color(0xFF3B6232),
             holidayDayColor = Color(0xFFFF0000),
+            selectedDayBorderColor = Color(0xFF3B6232),
+            holidayDayBorderColor = Color(0xFFFF0000),
             dayColor = Color(0xFF7C7C7C),
             dayNameColor = Color(0xFFCCCCCC)
         )
@@ -186,8 +190,20 @@ private fun CalendarEvents() {
 | `calendarState.weekState.updateEvents(...)` | Updates the visible weekly events. |
 | `calendarState.monthState.updateEvents(...)` | Updates the visible monthly events. |
 | `tabBorderColor`, `tabSelectedColor` | Customize **tab bar border and selected color**. |
-| `selectedDayColor`, `holidayDayColor` | Set colors for **selected days** and **holidays**. |
+| `tabsHalfWidth` | When `true`, tabs use **half screen width**; default `false` fills max width. |
+| `tabsRtl` | Controls tab layout direction — `true` for **RTL** (default), `false` for **LTR**. |
+| `selectedDayColor`, `holidayDayColor` | Set text colors for **selected days** and **holidays**. |
+| `selectedDayBorderColor`, `holidayDayBorderColor` | Optional border colors for selected/holiday days; omit to hide borders. |
 | `dayColor`, `dayNameColor` | Define text colors for day numbers and names. |
+
+---
+
+### 📋 Changelog
+
+**v1.1.0**
+- Add `tabsHalfWidth` and `tabsRtl` flags for tab bar layout
+- Add optional `selectedDayBorderColor` and `holidayDayBorderColor` for day cell borders
+- Add `testTag("tabs")` for UI testing
 
 ---
 
