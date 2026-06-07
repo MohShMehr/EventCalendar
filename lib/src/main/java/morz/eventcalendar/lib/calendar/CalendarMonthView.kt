@@ -156,6 +156,8 @@ fun CalendarMonthView(
     registry: RendererRegistry,
     selectedColor: Color,
     holidayColor: Color,
+    selectedBorderColor: Color? = null,
+    holidayBorderColor: Color? = null,
     todayColor: Color,
     dayColor: Color,
     dayNameColor: Color,
@@ -188,6 +190,8 @@ fun CalendarMonthView(
             registry = registry,
             selectedColor = selectedColor,
             holidayColor = holidayColor,
+            selectedBorderColor = selectedBorderColor,
+            holidayBorderColor = holidayBorderColor,
             todayColor = todayColor,
             dayColor = dayColor,
             dayNameColor = dayNameColor
@@ -271,6 +275,8 @@ private fun MonthlyCalendarGrid(
     registry: RendererRegistry,
     selectedColor: Color,
     holidayColor: Color,
+    selectedBorderColor: Color?,
+    holidayBorderColor: Color?,
     todayColor: Color,
     dayColor: Color,
     dayNameColor: Color,
@@ -294,6 +300,8 @@ private fun MonthlyCalendarGrid(
                 registry = registry,
                 selectedColor = selectedColor,
                 holidayColor = holidayColor,
+                selectedBorderColor = selectedBorderColor,
+                holidayBorderColor = holidayBorderColor,
                 todayColor = todayColor,
                 dayColor = dayColor,
             )
@@ -332,6 +340,8 @@ private fun MonthlyDaysGrid(
     registry: RendererRegistry,
     selectedColor: Color,
     holidayColor: Color,
+    selectedBorderColor: Color?,
+    holidayBorderColor: Color?,
     todayColor: Color,
     dayColor: Color,
 ) {
@@ -378,6 +388,8 @@ private fun MonthlyDaysGrid(
                     },
                     selectedColor = selectedColor,
                     holidayColor = holidayColor,
+                    selectedBorderColor = selectedBorderColor,
+                    holidayBorderColor = holidayBorderColor,
                     todayColor = todayColor,
                     dayColor = dayColor
                 )
@@ -387,6 +399,8 @@ private fun MonthlyDaysGrid(
                     dayItem = dayItem,
                     selectedColor = selectedColor,
                     holidayColor = holidayColor,
+                    selectedBorderColor = selectedBorderColor,
+                    holidayBorderColor = holidayBorderColor,
                     todayColor = todayColor,
                     dayColor = dayColor,
                     onDayClick = { },

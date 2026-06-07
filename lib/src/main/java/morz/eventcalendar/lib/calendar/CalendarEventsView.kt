@@ -15,6 +15,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -92,8 +93,12 @@ fun CalendarEventsView(
     modifier: Modifier = Modifier,
     tabBorderColor: Color = Color(0xFFEEEEEE),
     tabSelectedColor: Color = Color(0xFF7B55D3),
+    tabsHalfWidth: Boolean = false,
+    tabsRtl: Boolean = true,
     selectedDayColor: Color = Color(0xFF9C7DFF),
     holidayDayColor: Color = Color(0xFFCF3434),
+    selectedDayBorderColor: Color? = null,
+    holidayDayBorderColor: Color? = null,
     todayColor: Color = Color(0xFF673AB7),
     dayColor: Color = Color.Black,
     dayNameColor: Color = Color.Gray,
@@ -114,9 +119,13 @@ fun CalendarEventsView(
         registry = registry,
         tabBorderColor = tabBorderColor,
         tabSelectedColor = tabSelectedColor,
+        tabsHalfWidth = tabsHalfWidth,
+        tabsRtl = tabsRtl,
         selectedDayColor = selectedDayColor,
-        todayColor = todayColor,
+        selectedDayBorderColor = selectedDayBorderColor,
         holidayDayColor = holidayDayColor,
+        holidayDayBorderColor = holidayDayBorderColor,
+        todayColor = todayColor,
         dayColor = dayColor,
         dayNameColor = dayNameColor
     )
@@ -129,8 +138,12 @@ private fun CalendarEventsContent(
     state: CalendarEventsState,
     tabBorderColor: Color,
     tabSelectedColor: Color,
+    tabsHalfWidth: Boolean,
+    tabsRtl: Boolean,
     selectedDayColor: Color,
     holidayDayColor: Color,
+    selectedDayBorderColor: Color?,
+    holidayDayBorderColor: Color?,
     todayColor: Color,
     dayColor: Color,
     dayNameColor: Color,
@@ -140,9 +153,13 @@ private fun CalendarEventsContent(
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
         Column(modifier) {
             CalendarTabsView(
+                modifier = Modifier
+                    .testTag("tabs"),
                 state = state.tabsState,
                 borderColor = tabBorderColor,
-                selectedColor = tabSelectedColor
+                selectedColor = tabSelectedColor,
+                showInHalfWidth = tabsHalfWidth,
+                tabsRtl = tabsRtl,
             )
 
             Spacer(modifier = Modifier.height(10.dp))
@@ -154,6 +171,8 @@ private fun CalendarEventsContent(
                         registry = registry,
                         selectedColor = selectedDayColor,
                         holidayColor = holidayDayColor,
+                        selectedBorderColor = selectedDayBorderColor,
+                        holidayBorderColor = holidayDayBorderColor,
                         dayColor = dayColor,
                         dayNameColor = dayNameColor,
                         todayColor = todayColor
@@ -166,6 +185,8 @@ private fun CalendarEventsContent(
                         registry = registry,
                         selectedColor = selectedDayColor,
                         holidayColor = holidayDayColor,
+                        selectedBorderColor = selectedDayBorderColor,
+                        holidayBorderColor = holidayDayBorderColor,
                         dayColor = dayColor,
                         dayNameColor = dayNameColor,
                         todayColor = todayColor
@@ -195,5 +216,7 @@ private fun CalendarEventsViewPreview() {
     CalendarEventsView(
         state = calendarState,
         modifier = Modifier.fillMaxWidth(),
+        tabsHalfWidth = true,
+        tabsRtl = false
     )
 }

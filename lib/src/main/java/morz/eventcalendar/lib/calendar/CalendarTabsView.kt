@@ -65,65 +65,72 @@ fun CalendarTabsView(
     ),
     borderColor: Color,
     selectedColor: Color,
-    showInHalfWidth: Boolean = false
+    showInHalfWidth: Boolean = false,
+    tabsRtl: Boolean = true,
 ) {
     val shape = RoundedCornerShape(20.dp)
     val fraction =
         if (showInHalfWidth) 0.5f else 1.0f
     Row(
         modifier
-            .fillMaxWidth(fraction = fraction),
-        horizontalArrangement = Arrangement.End
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(48.dp)
-                .clip(shape)
-                .background(Color.White)
-                .border(
-                    border = BorderStroke(1.dp, borderColor),
-                    shape = shape
-                )
-                .testTag("top tabs")
-                .padding(4.dp),
-            contentAlignment = Alignment.Center
-        )
-        {
-            Row(
-                modifier = Modifier.fillMaxSize(),
-                horizontalArrangement = Arrangement.spacedBy(0.dp)
+            .fillMaxWidth(),
+        horizontalArrangement = if (tabsRtl) Arrangement.Start else Arrangement.End
+    )
+    {
+        Row(
+            modifier
+                .fillMaxWidth(fraction = fraction),
+            horizontalArrangement = Arrangement.End
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(48.dp)
+                    .clip(shape)
+                    .background(Color.White)
+                    .border(
+                        border = BorderStroke(1.dp, borderColor),
+                        shape = shape
+                    )
+                    .testTag("top tabs")
+                    .padding(4.dp),
+                contentAlignment = Alignment.Center
             ) {
-                CalendarTab.entries.forEach { tab ->
-                    val isSelected = state.selectedTabIndex == tab.ordinal
-                    val text = tab.value
-                    Box(
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(48.dp)
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(
-                                if (isSelected) selectedColor else Color.Transparent,
-                                RoundedCornerShape(20.dp)
-                            )
-                            .clickable { state.updateSelected(tab.ordinal) }
-                            .padding(
-                                start = if (isSelected) 8.dp else 0.dp,
-                                end = if (isSelected) 8.dp else 0.dp,
-                                top = if (isSelected) 4.dp else 0.dp,
-                                bottom = if (isSelected) 4.dp else 0.dp
-                            ),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
+                Row(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalArrangement = Arrangement.spacedBy(0.dp)
+                ) {
+                    CalendarTab.entries.forEach { tab ->
+                        val isSelected = state.selectedTabIndex == tab.ordinal
+                        val text = tab.value
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(48.dp)
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(
+                                    if (isSelected) selectedColor else Color.Transparent,
+                                    RoundedCornerShape(20.dp)
+                                )
+                                .clickable { state.updateSelected(tab.ordinal) }
+                                .padding(
+                                    start = if (isSelected) 8.dp else 0.dp,
+                                    end = if (isSelected) 8.dp else 0.dp,
+                                    top = if (isSelected) 4.dp else 0.dp,
+                                    bottom = if (isSelected) 4.dp else 0.dp
+                                ),
+                            contentAlignment = Alignment.Center
                         ) {
-                            Text(
-                                text = text,
-                                color = if (isSelected) Color.White else Color.Gray,
-                                fontSize = 14.sp,
-                                fontWeight = if (isSelected) FontWeight.Medium else FontWeight.Normal
-                            )
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Text(
+                                    text = text,
+                                    color = if (isSelected) Color.White else Color.Gray,
+                                    fontSize = 14.sp,
+                                    fontWeight = if (isSelected) FontWeight.Medium else FontWeight.Normal
+                                )
+                            }
                         }
                     }
                 }
@@ -140,7 +147,7 @@ fun CalendarTabsView(
 private fun CalendarTabsFullWidthPreview() {
     Box(
         modifier = Modifier.fillMaxWidth()
-    ){
+    ) {
 
         CalendarTabsView(
             borderColor = Color(0xFFEEEEEE),
@@ -155,14 +162,34 @@ private fun CalendarTabsFullWidthPreview() {
     backgroundColor = 0xFF000000
 )
 @Composable
-private fun CalendarTabsHalfWidthPreview() {
+private fun CalendarTabsHalfWidthRTLPreview() {
     Box(
         modifier = Modifier.fillMaxWidth()
-    ){
+    ) {
         CalendarTabsView(
             borderColor = Color(0xFFEEEEEE),
             selectedColor = Color(0xFF7B55D3),
-            showInHalfWidth = true
+            showInHalfWidth = true,
+            tabsRtl = true,
+        )
+    }
+}
+
+@Preview(
+    locale = "FA",
+    showBackground = true,
+    backgroundColor = 0xFF000000
+)
+@Composable
+private fun CalendarTabsHalfWidthLTRPreview() {
+    Box(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        CalendarTabsView(
+            borderColor = Color(0xFFEEEEEE),
+            selectedColor = Color(0xFF7B55D3),
+            showInHalfWidth = true,
+            tabsRtl = false,
         )
     }
 }

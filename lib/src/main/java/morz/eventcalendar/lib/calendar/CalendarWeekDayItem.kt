@@ -40,6 +40,8 @@ fun CalendarWeekDayItem(
     onDayClick: () -> Unit,
     selectedColor: Color,
     holidayColor: Color,
+    selectedBorderColor: Color? = null,
+    holidayBorderColor: Color? = null,
     todayColor: Color,
     dayColor: Color,
     dayNameColor: Color,
@@ -60,20 +62,24 @@ fun CalendarWeekDayItem(
                 .fillMaxSize()
                 .background(Color.White)
                 .then(
-                    if (dayItem.isSelected) {
-                        Modifier.border(
-                            width = 2.dp,
-                            color = selectedColor,
-                            shape = RoundedCornerShape(12.dp)
-                        )
-                    } else if (dayItem.isHoliday) {
-                        Modifier.border(
-                            width = 2.dp,
-                            color = holidayColor,
-                            shape = RoundedCornerShape(12.dp)
-                        )
-                    } else {
-                        Modifier
+                    when {
+                        dayItem.isSelected && selectedBorderColor != null -> {
+                            Modifier.border(
+                                width = 2.dp,
+                                color = selectedBorderColor,
+                                shape = RoundedCornerShape(12.dp)
+                            )
+                        }
+
+                        dayItem.isHoliday && holidayBorderColor != null -> {
+                            Modifier.border(
+                                width = 2.dp,
+                                color = holidayBorderColor,
+                                shape = RoundedCornerShape(12.dp)
+                            )
+                        }
+
+                        else -> Modifier
                     }
                 )
                 .clickable { onDayClick() }
